@@ -1,1 +1,31 @@
-[]
+[
+    {
+        "id": 1,
+        "nom": "Plongée sous-marine",
+        "description": "Découvrez les merveilles sous-marines avec notre activité de plongée sous-marine. Explorez les récifs coralliens, nagez aux côtés de poissons colorés et admirez la beauté de la vie marine. Que vous soyez débutant ou plongeur expérimenté, nos instructeurs qualifiés vous guideront à travers une expérience inoubliable dans les eaux cristallines.",
+        "duree": "2 heures",
+        "prix": 90,
+        "min_participants": 2,
+        "max_participants": 6
+    },
+
+    {
+        "id": 2,
+        "nom": "Sortie en bateau",
+        "description": "Embarquez pour une aventure en mer avec notre activité de sortie en bateau. Profitez d'une journée de détente sur l'eau, explorez les côtes pittoresques et découvrez des criques cachées. Que vous souhaitiez faire du snorkeling, pêcher ou simplement vous détendre au soleil, notre sortie en bateau est l'occasion parfaite de profiter de la beauté de la mer et de créer des souvenirs inoubliables.",
+        "duree": "4 heures",
+        "prix": 100,
+        "min_participants": 1,
+        "max_participants": 10
+    },
+
+    {
+        "id": 3,
+        "nom": "Kayak/ Canoë",
+        "description": "Partez à l'aventure avec notre activité de kayak/canoë. Navigatez sur les eaux calmes, découvrez des paysages pittoresques et profitez d'une journée inoubliable sur l'eau. Que vous soyez un débutant ou un pratiquant expérimenté, nos instructeurs qualifiés vous accompagneront pour une expérience sécurisée et enrichissante.",
+        "duree": "4 heures",
+        "prix": 100,
+        "min_participants": 2,
+        "max_participants": 8
+    }
+]
