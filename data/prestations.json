@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name": "Navette aéroport",
+        "description": "Service de navette pour les transferts depuis et vers l'aéroport.",
+        "price": 40,
+        "type_tarification": "fixe"
+    },
+    {
+        "id": 2,
+        "name": "Petit déjeuner en chambre",
+        "description": "Service de petit déjeuner livré directement dans la chambre.",
+        "price": 20,
+        "type_tarification": "par_personne"
+    },
+    {
+        "id": 3,
+        "name": "Diner tropical",
+        "description": "Un délicieux diner sur la plage avec un menu de spécialités locales.",
+        "price": 100,
+        "type_tarification": "par_personne"
+    },
+    {
+        "id": 4,
+        "name": "Massage relaxant",
+        "description": "Séance de massage pour une détente totale dans notre spa.",
+        "price": 80,
+        "type_tarification": "par_personne"
+    },
+    {
+        "id": 5,
+        "name": "Excursion en bateau",
+        "description": "Une excursion en bateau pour découvrir les merveilles de la côte.",
+        "price": 150,
+        "type_tarification": "par_personne"
+    }
+]
