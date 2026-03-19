@@ -9108,3 +9108,42 @@ textarea.form-control {
   100% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -136px; } }
+
+
+    .service-box {
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.service-box:hover {
+  transform: translateY(-10px);
+}
+
+.icon-circle {
+  width: 90px;
+  height: 90px;
+  background: #f4f1ea;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-circle span {
+  font-size: 35px;
+  color: #c19b76;
+}
+
+.service-box h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.service-box p {
+  color: #777;
+  font-size: 15px;
+}
+
+
+
