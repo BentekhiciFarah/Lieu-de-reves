@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         "nb_personnes" => $nbPersonnes,
         "type_chambre" => $typeChambre,
         "activites" => $activites,
-        "statut" => "en_attente", // statut initial
-        "date_creation" => date("Y-m-d H:i:s")
+        "statut" => "en_attente", // Le temps que l'admin valide
+        "date_creation" => date("Y-m-d H:i:s") // La date ou la demande a été faite
     ];
 
     // Ajouter la réservation
