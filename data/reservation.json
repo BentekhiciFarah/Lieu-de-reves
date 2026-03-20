@@ -1,0 +1,34 @@
+[
+    {
+        "id": "17739657099511",
+        "nom": "amine",
+        "email": "aminechboukat088@gmail.com",
+        "date_debut": "2026-03-23",
+        "date_fin": "2026-03-26",
+        "nb_personnes": "2",
+        "type_chambre": "Bungalow",
+        "activites": [
+            "Plong\u00e9e sous-marine",
+            "Paddle \/ Kayak"
+        ],
+        "message": "",
+        "statut": "refus\u00e9e",
+        "date_creation": "2026-03-20 01:15:09"
+    },
+    {
+        "id": "17739659381285",
+        "nom": "amine",
+        "email": "aminechboukat088@gmail.com",
+        "date_debut": "2026-03-21",
+        "date_fin": "2026-03-23",
+        "nb_personnes": "2",
+        "type_chambre": "bungalow",
+        "activites": [
+            "Plong\u00e9e sous-marine",
+            "Paddle \/ Kayak"
+        ],
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-03-20 01:18:58"
+    }
+]

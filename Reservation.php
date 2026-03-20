@@ -224,9 +224,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="type_chambre">Type de chambre *</label>
                 <select class="form-control" id="type_chambre" name="type_chambre" required>
                   <option value="">Choisir...</option>
-                  <option value="Bungalow sur pilotis" <?php echo (($_POST['type_chambre'] ?? '') === 'Bungalow sur pilotis') ? 'selected' : ''; ?>>Bungalow sur pilotis</option>
-                  <option value="Villa sur la plage" <?php echo (($_POST['type_chambre'] ?? '') === 'Villa sur la plage') ? 'selected' : ''; ?>>Villa sur la plage</option>
-                  <option value="Suite avec piscine privée" <?php echo (($_POST['type_chambre'] ?? '') === 'Suite avec piscine privée') ? 'selected' : ''; ?>>Suite avec piscine privée</option>
+                  <option value="bungalow" <?php echo (($_POST['type_chambre'] ?? '') === 'Bungalow sur pilotis') ? 'selected' : ''; ?>>Bungalow sur pilotis</option>
+                  <option value="villa" <?php echo (($_POST['type_chambre'] ?? '') === 'Villa sur la plage') ? 'selected' : ''; ?>>Villa sur la plage</option>
+                  <option value="suite" <?php echo (($_POST['type_chambre'] ?? '') === 'Suite avec piscine privée') ? 'selected' : ''; ?>>Suite avec piscine privée</option>
                 </select>
               </div>
 

@@ -5,5 +5,12 @@
         "prenom": "Jean",
         "email": "jean.dupont@example.com",
         "password ": "motdepasse123"
+    },
+    {
+        "id": "17739659528109",
+        "nom": "amine",
+        "email": "aminechboukat088@gmail.com",
+        "password": "3623e99135",
+        "role": "client"
     }
 ]
