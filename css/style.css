@@ -9145,5 +9145,33 @@ textarea.form-control {
   font-size: 15px;
 }
 
+.activity-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: 0.3s;
+}
 
+.activity-card:hover {
+  transform: translateY(-8px);
+}
+
+.activity-img {
+  height: 260px;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.activity-text {
+  padding: 25px;
+  text-align: center;
+}
+
+.activity-meta {
+  color: #c19b76;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 10px;
+}
 

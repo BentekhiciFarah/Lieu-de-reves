@@ -42,8 +42,7 @@
 	      <div class="collapse navbar-collapse" id="ftco-nav">
 	        <ul class="navbar-nav ml-auto">
 				<li class="nav-item active"><a href="index.php" class="nav-link">Accueil</a></li>
-				<li class="nav-item"><a href="#chambres" class="nav-link">Chambres</a></li>
-				<li class="nav-item"><a href="#activites" class="nav-link">Activités</a></li>
+				<li class="nav-item"><a href="Activites.php" class="nav-link">Activités</a></li>
 				<li class="nav-item"><a href="reservation.php" class="nav-link">Réserver</a></li>
 				<li class="nav-item"><a href="Connexion.php" class="nav-link">Connexion</a></li>
 	        </ul>
@@ -81,76 +80,6 @@
         </div>
       </div>
     </section>
-
-    <section class="ftco-booking">
-    	<div class="container">
-    		<div class="row">
-    			<div class="col-lg-12">
-                <form action="reservation.php" method="get" class="booking-form">	        		<div class="row">
-	        			<div class="col-md-3 d-flex">
-	        				<div class="form-group p-4 align-self-stretch d-flex align-items-end">
-	        					<div class="wrap">
-				    					<label for="#">Date de début</label>
-				    					<input type="text" class="form-control checkin_date" placeholder="Date de début">
-			    					</div>
-			    				</div>
-	        			</div>
-	        			<div class="col-md-3 d-flex">
-	        				<div class="form-group p-4 align-self-stretch d-flex align-items-end">
-	        					<div class="wrap">
-				    					<label for="#">Date de fin</label>
-				    					<input type="text" class="form-control checkout_date" placeholder="Date de fin">
-			    				</div>
-			    				</div>
-	        			</div>
-	        			<div class="col-md d-flex">
-	        				<div class="form-group p-4 align-self-stretch d-flex align-items-end">
-	        					<div class="wrap">
-			      					<label for="#">Type de chambre</label>
-			      					<div class="form-field">
-			        					<div class="select-wrap">
-			                    <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-			                    <select name="" id="" class="form-control">
-			                    	<option value="bungalow">Bungalow de luxe</option>
-									<option value="villa">Villa sur la plage</option>
-									<option value="suite">Suite avec piscine privée</option>
-			                    </select>
-			                  </div>
-				              </div>
-				            </div>
-		              </div>
-	        			</div>
-	        			<div class="col-md d-flex">
-	        				<div class="form-group p-4 align-self-stretch d-flex align-items-end">
-	        					<div class="wrap">
-			      					<label for="#">Nombre de personnes</label>
-			      					<div class="form-field">
-			        					<div class="select-wrap">
-			                    <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-			                    <select name="" id="" class="form-control">
-			                    	<option value="">1 personne</option>
-			                      <option value="">2 personnes</option>
-			                      <option value="">3 personnes</option>
-			                      <option value="">4 personnes</option>
-			                      <option value="">5 personnes</option>
-			                      <option value="">6 personnes</option>
-			                    </select>
-			                  </div>
-				              </div>
-				            </div>
-		              </div>
-	        			</div>
-	        			<div class="col-md d-flex">
-	        				<div class="form-group d-flex align-self-stretch">
-							<input type="submit" value="Réserver" class="btn btn-primary py-3 px-4 align-self-stretch">			            </div>
-	        			</div>
-	        		</div>
-	        	</form>
-	    		</div>
-    		</div>
-    	</div>
-    </section>
-
 
     <section class="ftco-section ftc-no-pb ftc-no-pt">
 			<div class="container">
