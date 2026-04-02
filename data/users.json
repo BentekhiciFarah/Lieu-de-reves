@@ -47,5 +47,19 @@
         "email": "marre@gmail.com",
         "password": "$2y$10$LmI29pa3EKP.\/KNNyOdG9u0EbeMSYo.FHfyEIQmiUQOApGeqOMZ2i",
         "role": "client"
+    },
+    {
+        "id": "17751507135986",
+        "nom": "hola",
+        "email": "hola@gmail.com",
+        "password": "$2y$10$lpMyUvnvo8YfiF3khDKHs.\/uqfeUM1wItlq9ZwMYEz4k\/2HU0REGO",
+        "role": "client"
+    },
+    {
+        "id": "17751524835823",
+        "nom": "moi",
+        "email": "moi@site.com",
+        "password": "$2y$10$0BzX.XrFYh50Cw\/DV1TRk.uUibWjGD4\/VV.gbvyoijNNHfOGrkQN6",
+        "role": "client"
     }
 ]

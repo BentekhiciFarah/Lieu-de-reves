@@ -27,6 +27,59 @@
     <link rel="stylesheet" href="css/icomoon.css">
     <link rel="stylesheet" href="css/style.css">
   </head>
+
+<script>
+$(document).ready(function() {
+
+    $.ajax({
+        url: "get_prestations.php",
+        method: "GET",
+        dataType: "json",
+        success: function(data) {
+
+            let html = "";
+
+            if (data.length === 0) {
+                html = `
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center">
+                            Vous devez avoir une réservation validée pour accéder aux prestations.
+                        </div>
+                    </div>
+                `;
+            } else {
+
+                data.forEach(p => {
+
+                    html += `
+                        <div class="col-md-6 mb-4">
+                            <div class="pricing-entry d-flex ftco-animate">
+                                <div class="desc pl-3 w-100">
+                                    <div class="d-flex text align-items-center">
+                                        <h3><span>${p.name}</span></h3>
+                                        <span class="price">${p.price}€</span>
+                                    </div>
+                                    <div class="d-block">
+                                        <p>${p.description}</p>
+                                        <small>Tarification : ${p.type_tarification}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+            }
+
+            $("#prestationsContainer").html(html);
+        },
+        error: function(err) {
+            console.log("Erreur AJAX :", err);
+        }
+    });
+
+});
+</script>
   <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
