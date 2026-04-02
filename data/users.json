@@ -33,5 +33,19 @@
         "email": "hfhdhdu@gmail.com",
         "password": "$2y$10$E84qsNISlgMGsHTa3b77iuXu9VFlmHyeq7GT0\/wRndfQgn0PW37ve",
         "role": "client"
+    },
+    {
+        "id": "17751437571216",
+        "nom": "hey",
+        "email": "hey@gmail.com",
+        "password": "$2y$10$9kjKy.9luRNHDjfZbhiDce2D\/lXWs745RuvcReuyHhaVFbhNPBh02",
+        "role": "client"
+    },
+    {
+        "id": "17751442672307",
+        "nom": "marre",
+        "email": "marre@gmail.com",
+        "password": "$2y$10$LmI29pa3EKP.\/KNNyOdG9u0EbeMSYo.FHfyEIQmiUQOApGeqOMZ2i",
+        "role": "client"
     }
 ]
