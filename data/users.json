@@ -12,5 +12,26 @@
         "email": "aminechboukat088@gmail.com",
         "password": "3623e99135",
         "role": "client"
+    },
+    {
+        "id": "17745233406201",
+        "nom": "Bentekhici",
+        "email": "bentekhici.farah@gmail.com",
+        "password": "$2y$10$SuvcbZ9msnbjMjlU0SJ36OH5SreHQFettA5in47lYYMjsdkdmFzg.",
+        "role": "client"
+    },
+    {
+        "id": "17745236542594",
+        "nom": "Eve",
+        "email": "farah.bentekhici@universite-paris-saclay.fr",
+        "password": "$2y$10$sElfz5xzH1\/PjCFnlssioOWlIbLMOA5XfV7bUOT2yYiszjjGmzikO",
+        "role": "client"
+    },
+    {
+        "id": "17745237871664",
+        "nom": "loi",
+        "email": "hfhdhdu@gmail.com",
+        "password": "$2y$10$E84qsNISlgMGsHTa3b77iuXu9VFlmHyeq7GT0\/wRndfQgn0PW37ve",
+        "role": "client"
     }
 ]

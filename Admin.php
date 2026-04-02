@@ -23,13 +23,16 @@ $chambresDisponibles = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $reservationId = $_POST['reservation_id'] ?? '';
     $action = $_POST['action'] ?? '';
-
+    
+    // Lecture des données nécessaires
     $reservations = readJson("reservation.json") ?: [];
     $users = readJson("users.json") ?: [];
 
+    // Trouver la réservation correspondante
     foreach ($reservations as &$res) {
         if ($res['id'] === $reservationId) {
 
+            // Validation de la réservation
             if ($action === 'valider') {
                 $type = $res['type_chambre'];
                 $countReserved = 0;
@@ -44,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
+                // Vérification disponibilité avant validation
                 if (!isset($chambresDisponibles[$type])) {
                     $messageAdmin = "Type de chambre inconnu : " . htmlspecialchars($type);
                 } elseif ($countReserved >= $chambresDisponibles[$type]) {
@@ -60,19 +64,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
 
+                    // Génération mot de passe et création compte si nécessaire
                     if (!$userExiste) {
+                        // Génération aléatoire d'un mot de passe temporaire
                         $motDePasse = bin2hex(random_bytes(5));
-
+                        
                         $users[] = [
                             "id" => generateId(),
                             "nom" => $res['nom'],
                             "email" => $res['email'],
-                            "password" => $motDePasse,
+                            // Hash du mot de passe pour sécurité
+                            "password" => password_hash($motDePasse, PASSWORD_DEFAULT),
                             "role" => "client"
                         ];
 
+                        // Sauvegarde du nouveau compte sur le fichier JSON
                         writeJson("users.json", $users);
-
+                        // Message pour l'admin avec le mot de passe temporaire
+                        echo "Compte créé. Mot de passe : " . $motDePasse;
+                        
+                        // Message pour l'admin pour qu'il puisse communiquer le mot de passe au client par mail
                         $messageAdmin = "Réservation validée pour {$res['nom']} ({$res['email']})\n"
                                       . "Mot de passe temporaire : $motDePasse\n"
                                       . "Merci d'envoyer ce mot de passe au client.";
@@ -81,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       . "Le client possède déjà un compte.";
                     }
                 }
-
+            // Refus de la réservation
             } elseif ($action === 'refuser') {
                 $res['statut'] = 'refusée';
                 $messageAdmin = "Réservation refusée pour {$res['nom']} ({$res['email']})";
@@ -90,10 +101,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
         }
     }
+    // Libération de la référence pour éviter les effets de bord
     unset($res);
 
+    // Ajout de la réservation dans le fichier JSON
     writeJson("reservation.json", $reservations);
 
+    // Stockage du message pour affichage après redirection
     $_SESSION['message_admin'] = $messageAdmin;
     header("Location: admin.php");
     exit;
@@ -109,6 +123,7 @@ $chambresReservees = [
     "suite" => 0
 ];
 
+// Comptage des réservations validées par type de chambre
 foreach ($reservations as $r) {
     if (
         isset($r['type_chambre'], $r['statut']) &&
