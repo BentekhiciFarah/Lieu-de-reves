@@ -56,13 +56,14 @@ $prestations_client = readJson("prestations_client.json") ?: [];
                 <p><strong>Personnes :</strong> <?= $res['nb_personnes'] ?></p>
 
                 <p><strong>Statut :</strong>
-                    <?php if (strpos($res['statut'], 'attente') !== false): ?>
-                        <span class="badge bg-warning text-dark">En attente</span>
-                    <?php elseif (strpos($res['statut'], 'valid') !== false): ?>
-                        <span class="badge bg-success">Validée</span>
-                    <?php else: ?>
-                        <span class="badge bg-danger">Refusée</span>
-                    <?php endif; ?>
+                    <span id="statut_resa_<?= htmlspecialchars($res['id']) ?>" 
+                        class="badge 
+                        <?php 
+                            echo ($res['statut'] === 'validée') ? 'bg-success' : 
+                                (($res['statut'] === 'refusée') ? 'bg-danger' : 'bg-warning text-dark'); 
+                        ?>">
+                        <?= htmlspecialchars(ucfirst($res['statut'])) ?>
+                    </span>
                 </p>
 
                 <?php if(!empty($resPrestations)): ?>
@@ -147,6 +148,33 @@ $(document).ready(function(){
     });
     <?php endif; ?>
 });
+
+// mettre à jour le statut de la réservation
+function refreshReservations() {
+    $.ajax({
+        url: 'refresh_reservations.php', // un petit fichier qui renvoie uniquement tes réservations client en JSON
+        method: 'GET',
+        dataType: 'json',
+        success: function(data){
+            data.forEach(res => {
+                const badge = $("#statut_resa_" + res.id);
+                if(badge.length){
+                    // Mettre à jour texte
+                    badge.text(res.statut.charAt(0).toUpperCase() + res.statut.slice(1));
+
+                    // Mettre à jour couleur
+                    badge.removeClass("bg-success bg-warning bg-danger text-dark");
+                    if(res.statut === 'validée') badge.addClass("bg-success");
+                    else if(res.statut === 'refusée') badge.addClass("bg-danger");
+                    else badge.addClass("bg-warning text-dark");
+                }
+            });
+        }
+    });
+}
+
+// Vérifie les statuts toutes les 5 secondes
+setInterval(refreshReservations, 5000);
 </script>
 </body>
 </html>

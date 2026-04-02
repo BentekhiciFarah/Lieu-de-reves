@@ -12,6 +12,50 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "admin") {
 $messageAdmin = $_SESSION['message_admin'] ?? "";
 unset($_SESSION['message_admin']);
 
+// AJAX pour mise à jour du statut prestation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prestation_id'], $_POST['action']) 
+    && isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
+    && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+
+    $prestationId = $_POST['prestation_id'];
+    $action = $_POST['action'];
+    $adresse = $_POST['adresse'] ?? '';
+    $heure = $_POST['heure'] ?? '';
+
+    $prestations_client = readJson("prestations_client.json") ?: [];
+    $updated = false;
+    $nouveau_statut = '';
+
+    foreach ($prestations_client as &$pc) {
+        if (($pc['prestation']['id'] ?? '') == $prestationId) {
+            if ($action === 'valider') {
+                $pc['statut'] = 'validée';
+                $pc['adresse'] = $adresse;
+                $pc['heure'] = $heure;
+                $nouveau_statut = 'validée';
+                $updated = true;
+                $message = "Prestation validée";
+            } elseif ($action === 'refuser') {
+                $pc['statut'] = 'refusée';
+                $pc['adresse'] = '';
+                $pc['heure'] = '';
+                $nouveau_statut = 'refusée';
+                $updated = true;
+                $message = "Prestation refusée";
+            }
+            break;
+        }
+    }
+    unset($pc);
+
+    if ($updated) {
+        writeJson("../data/prestations_client.json", $prestations_client);
+        echo json_encode(["success" => true, "message" => $message, "nouveau_statut" => $nouveau_statut]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Prestation introuvable"]);
+    }
+    exit; // terminer le script pour AJAX
+}
 // Nombre total de chambres
 $chambresDisponibles = [
     "bungalow" => 5,
@@ -49,6 +93,38 @@ foreach ($reservations as $r) {
     <title>Admin - Gestion des réservations</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".prestation-form").on("submit", function(e){
+            e.preventDefault();
+            const form = $(this);
+            const prestationId = form.find("input[name='prestation_id']").val();
+            const action = $(document.activeElement).val(); // bouton cliqué
+            const adresse = form.find("input[name='adresse']").val();
+            const heure = form.find("input[name='heure']").val();
+
+            $.ajax({
+                url: "admin.php",
+                method: "POST",
+                dataType: "json",
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+                data: { prestation_id: prestationId, action: action, adresse: adresse, heure: heure },
+                success: function(res){
+                    alert(res.message);
+                    if(res.success){
+                        // mettre à jour le statut visible
+                        form.closest(".card-body").find("p strong:contains('Prestation')").next().text(res.nouveau_statut);
+                        form.remove(); // supprimer formulaire après action
+                    }
+                },
+                error: function(){
+                    alert("Erreur AJAX");
+                }
+            });
+        });
+    });
+</script>
 <body class="p-4 bg-light">
 
 <div class="container">
@@ -152,22 +228,16 @@ foreach ($reservations as $r) {
                 <p><strong>Description :</strong> <?= htmlspecialchars($pc['prestation']['description'] ?? '') ?></p>
 
                 <!-- Formulaire pour que l'admin valide ou refuse -->
-                <form action="Admin.php" method="POST" class="d-inline">
+                <form class="d-inline prestation-form">
                     <input type="hidden" name="prestation_id" value="<?= htmlspecialchars($prestationId) ?>">
-
-                    <!-- Saisie manuelle de l'adresse par l'admin -->
                     <div class="mb-2">
                         <label for="adresse_<?= $prestationId ?>">Adresse :</label>
                         <input type="text" id="adresse_<?= $prestationId ?>" name="adresse" value="<?= htmlspecialchars($adresse) ?>" class="form-control" required>
                     </div>
-
-                    <!-- Saisie manuelle de l'heure par l'admin -->
                     <div class="mb-2">
                         <label for="heure_<?= $prestationId ?>">Heure :</label>
                         <input type="time" id="heure_<?= $prestationId ?>" name="heure" value="<?= htmlspecialchars($heure) ?>" class="form-control" required>
                     </div>
-
-                    <!-- Boutons valider/refuser -->
                     <button type="submit" name="action" value="valider" class="btn btn-success btn-sm">Valider</button>
                     <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm">Refuser</button>
                 </form>
