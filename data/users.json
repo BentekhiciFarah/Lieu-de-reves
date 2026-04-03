@@ -61,5 +61,21 @@
         "email": "moi@site.com",
         "password": "$2y$10$0BzX.XrFYh50Cw\/DV1TRk.uUibWjGD4\/VV.gbvyoijNNHfOGrkQN6",
         "role": "client"
+    },
+    {
+        "id": 10,
+        "nom": "amine",
+        "prenom": "",
+        "email": "aminechbou@gmail.com",
+        "password": "$2y$10$ImmSeVOayZwb4P0HjYKDneWq4VsX4w1FJuxZZ4daR9P0tWfFB3HTO",
+        "role": "client"
+    },
+    {
+        "id": "17751721886484",
+        "nom": "amine",
+        "prenom": "",
+        "email": "amine@gmail.com",
+        "password": "$2y$10$mQ\/O\/X9HoZNoz4TGR8mLJe7cvGB37xX4UVMM9a1SrYWcIYwn6w1m6",
+        "role": "client"
     }
 ]

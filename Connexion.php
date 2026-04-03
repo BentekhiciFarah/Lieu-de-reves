@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($email === $adminEmail && $password === $adminPassword) {
         $_SESSION['role'] = "admin";
         // Redirection vers la page admin
-        header("Location: admin.php");
+        header("Location: Admin.php");
         exit;
     }
 
@@ -33,13 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
 
             // Redirection vers la page client
-            header("Location: client.php");
+            header("Location: Client.php");
             exit;
         }
     }
 
     // Si identifiants incorrects
-    header("Location: connexion.php?error=1");
+    header("Location: Connexion.php?error=1");
     exit;
 }
 ?>
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <!-- Formulaire de connexion -->
-            <form action="connexion.php" method="POST">
+            <form action="Connexion.php" method="POST">
                 <div class="mb-3">
                     <label for="email" class="form-label">Adresse email</label>
                     <input 

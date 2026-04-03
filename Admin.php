@@ -2,15 +2,149 @@
 session_start();
 require_once "includes/json_data.php";
 
+
+
 // Vérification accès admin
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== "admin") {
-    header("Location: connexion.php");
+    header("Location: Connexion.php");
     exit;
 }
 
 // Message admin après redirection
 $messageAdmin = $_SESSION['message_admin'] ?? "";
 unset($_SESSION['message_admin']);
+
+$activitiesData = readJson("activities.json") ?: [];
+ // Création d'une map id → nom pour les activités
+$activitiesMap = [];
+
+// Normalisation des activités pour éviter les erreurs d'affichage
+foreach ($activitiesData as $act) {
+    $activitiesMap[$act['id']] = $act['nom'];
+}
+
+
+// Traitement du formulaire de validation/refus de réservation
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_POST['action'])) {
+    $reservationId = $_POST['reservation_id'];
+    $action = $_POST['action'];
+
+    $reservations = readJson("reservation.json");
+    $users = readJson("users.json");
+
+    // Nombre total de chambres disponibles par type
+    $chambresDisponibles = [
+        'bungalow' => 5,
+        'villa' => 3,
+        'suite' => 2
+    ];
+
+    $messageAdmin = "Aucune action effectuée.";
+    $reservationTrouvee = false;
+
+    foreach ($reservations as &$res) {
+        if (($res['id'] ?? '') == $reservationId) {
+            $reservationTrouvee = true;
+
+            $type = strtolower(trim($res['type_chambre'] ?? ''));
+
+            // Normalisation des types
+            if ($type === 'bungalow sur pilotis' || $type === 'bungalow') {
+                $type = 'bungalow';
+            } elseif ($type === 'villa sur la plage' || $type === 'villa') {
+                $type = 'villa';
+            } elseif ($type === 'suite avec piscine privée' || $type === 'suite') {
+                $type = 'suite';
+            }
+
+            if ($action === 'valider') {
+                // Compter les chambres déjà validées du même type
+                $countReserved = 0;
+                foreach ($reservations as $r) {
+                    $typeR = strtolower(trim($r['type_chambre'] ?? ''));
+
+                    if ($typeR === 'bungalow sur pilotis' || $typeR === 'bungalow') {
+                        $typeR = 'bungalow';
+                    } elseif ($typeR === 'villa sur la plage' || $typeR === 'villa') {
+                        $typeR = 'villa';
+                    } elseif ($typeR === 'suite avec piscine privée' || $typeR === 'suite') {
+                        $typeR = 'suite';
+                    }
+
+                    if (
+                        $typeR === $type &&
+                        ($r['statut'] ?? '') === 'validée' &&
+                        ($r['id'] ?? '') != $reservationId
+                    ) {
+                        $countReserved++;
+                    }
+                }
+
+                if (!isset($chambresDisponibles[$type])) {
+                    $messageAdmin = "Type de chambre inconnu pour cette réservation.";
+                } elseif ($countReserved >= $chambresDisponibles[$type]) {
+                    $messageAdmin = "Impossible de valider : plus de chambres disponibles pour $type.";
+                } else {
+                    // Valider la réservation
+                    $res['statut'] = 'validée';
+
+                    // Vérifier si le client existe déjà
+                    $userExiste = false;
+                    foreach ($users as $user) {
+                        if (($user['email'] ?? '') === ($res['email'] ?? '')) {
+                            $userExiste = true;
+                            break;
+                        }
+                    }
+
+                    if (!$userExiste) {
+                        // Générer un mot de passe temporaire
+                        $motDePasse = bin2hex(random_bytes(5));
+
+                        // Créer le compte client
+                        $users[] = [
+                            "id" => generateId($users),
+                            "nom" => $res['nom'] ?? '',
+                            "prenom" => "",
+                            "email" => $res['email'] ?? '',
+                            "password" => password_hash($motDePasse, PASSWORD_DEFAULT),
+                            "role" => "client"
+                        ];
+
+                        writeJson("users.json", $users);
+
+                        $messageAdmin = "Réservation validée pour {$res['nom']} ({$res['email']}). "
+                                      . "Mot de passe temporaire : {$motDePasse}. "
+                                      . "Merci d'envoyer ce mot de passe au client.";
+                    } else {
+                        $messageAdmin = "Réservation validée pour {$res['nom']} ({$res['email']}). "
+                                      . "Le client possède déjà un compte.";
+                    }
+                }
+
+            } elseif ($action === 'refuser') {
+                $res['statut'] = 'refusée';
+                $messageAdmin = "Réservation refusée pour {$res['nom']} ({$res['email']}).";
+            }
+
+            break;
+        }
+    }
+    unset($res);
+
+    if ($reservationTrouvee) {
+        writeJson("reservation.json", $reservations);
+    } else {
+        $messageAdmin = "Réservation introuvable.";
+    }
+
+    $_SESSION['message_admin'] = $messageAdmin;
+
+    header("Location: Admin.php");
+    exit;
+}
+
 
 // AJAX pour mise à jour du statut prestation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prestation_id'], $_POST['action']) 
@@ -49,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prestation_id'], $_PO
     unset($pc);
 
     if ($updated) {
-        writeJson("../data/prestations_client.json", $prestations_client);
+        writeJson("prestations_client.json", $prestations_client);
         echo json_encode(["success" => true, "message" => $message, "nouveau_statut" => $nouveau_statut]);
     } else {
         echo json_encode(["success" => false, "message" => "Prestation introuvable"]);
@@ -105,7 +239,7 @@ foreach ($reservations as $r) {
             const heure = form.find("input[name='heure']").val();
 
             $.ajax({
-                url: "admin.php",
+                url: "Admin.php",
                 method: "POST",
                 dataType: "json",
                 headers: { "X-Requested-With": "XMLHttpRequest" },
@@ -177,15 +311,27 @@ foreach ($reservations as $r) {
                 <p><strong>Nombre de personnes :</strong> <?= htmlspecialchars($res['nb_personnes'] ?? '') ?></p>
                 <p><strong>Activités :</strong>
                     <?php
-                    if (!empty($res['activites']) && is_array($res['activites'])) {
-                        echo htmlspecialchars(implode(", ", $res['activites']));
-                    } else {
-                        echo "Aucune";
-                    }
+                        if (!empty($res['activites']) && is_array($res['activites'])) {
+
+                            $nomsActivites = [];
+
+                            foreach ($res['activites'] as $id) {
+                                if (isset($activitiesMap[$id])) {
+                                    $nomsActivites[] = $activitiesMap[$id];
+                                } else {
+                                    $nomsActivites[] = "Activité inconnue";
+                                }
+                            }
+
+                            echo htmlspecialchars(implode(", ", $nomsActivites));
+
+                        } else {
+                            echo "Aucune";
+                        }
                     ?>
                 </p>
 
-                <form action="admin.php" method="POST" class="d-inline">
+                <form action="Admin.php" method="POST" class="d-inline">
                     <input type="hidden" name="reservation_id" value="<?= htmlspecialchars($res['id']) ?>">
                     <button type="submit" name="action" value="valider" class="btn btn-success btn-sm">Valider</button>
                     <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm">Refuser</button>

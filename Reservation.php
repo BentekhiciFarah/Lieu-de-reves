@@ -5,6 +5,10 @@ require_once "includes/json_data.php";
 $successMessage = "";
 $errorMessage = "";
 
+$activitiesData = readJson("activities.json") ?: [];
+$activitesChoisies = $_POST['activites'] ?? [];
+$nbPersonnes = (int)($_POST['nb_personnes'] ?? 0);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nom = trim($_POST['nom'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -15,9 +19,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $activites = $_POST['activites'] ?? [];
     $message = trim($_POST['message'] ?? '');
 
-    if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChambre) {
-        $errorMessage = "Veuillez remplir tous les champs obligatoires.";
-    } else {
+$activitiesData = readJson("activities.json") ?: [];
+$activites = $_POST['activites'] ?? [];
+
+if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChambre) {
+    $errorMessage = "Veuillez remplir tous les champs obligatoires.";
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errorMessage = "Adresse email invalide.";
+} elseif ($dateFin < $dateDebut) {
+    $errorMessage = "La date de fin doit être postérieure ou égale à la date de début.";
+} elseif ($dateDebut < date('Y-m-d')) {
+    $errorMessage = "La date de début ne peut pas être dans le passé.";
+} elseif ($nbPersonnes < 1) {
+    $errorMessage = "Le nombre de personnes doit être supérieur à 0.";
+} else {
+    foreach ($activites as $activiteId) {
+        $activiteTrouvee = false;
+
+        foreach ($activitiesData as $activity) {
+            if ((string)$activity['id'] === (string)$activiteId) {
+                $activiteTrouvee = true;
+
+                $nomActivite = $activity['nom'] ?? 'Activité';
+                $minParticipants = (int)($activity['min_participants'] ?? 1);
+                $maxParticipants = (int)($activity['max_participants'] ?? PHP_INT_MAX);
+
+                if ($nbPersonnes < $minParticipants) {
+                    $errorMessage = "L'activité \"{$nomActivite}\" nécessite au minimum {$minParticipants} participants.";
+                } elseif ($nbPersonnes > $maxParticipants) {
+                    $errorMessage = "L'activité \"{$nomActivite}\" accepte au maximum {$maxParticipants} participants.";
+                }
+
+                break;
+            }
+        }
+
+        if (!$activiteTrouvee) {
+            $errorMessage = "Une activité sélectionnée est invalide.";
+        }
+
+        if (!empty($errorMessage)) {
+            break;
+        }
+    }
+
+    if (empty($errorMessage)) {
         $reservations = readJson("reservation.json") ?: [];
 
         $id = generateId();
@@ -42,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $successMessage = "Votre demande de réservation a été envoyée. L’administrateur la validera prochainement.";
     }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -143,8 +190,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="collapse navbar-collapse" id="ftco-nav">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item"><a href="index.php" class="nav-link">Accueil</a></li>
-        <li class="nav-item"><a href="activites.php" class="nav-link">Activités</a></li>
-        <li class="nav-item active"><a href="reservation.php" class="nav-link">Réserver</a></li>
+        <li class="nav-item"><a href="Activites.php" class="nav-link">Activités</a></li>
+        <li class="nav-item active"><a href="Reservation.php" class="nav-link">Réserver</a></li>
         <li class="nav-item"><a href="Connexion.php" class="nav-link">Connexion</a></li>
       </ul>
     </div>
@@ -186,7 +233,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
           <?php endif; ?>
 
-          <form method="POST" action="reservation.php">
+          <form method="POST" action="Reservation.php">
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="nom">Nom complet *</label>
@@ -212,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="nb_personnes">Nombre de personnes *</label>
                 <select class="form-control" id="nb_personnes" name="nb_personnes" required>
                   <option value="">Choisir...</option>
-                  <?php for ($i = 1; $i <= 6; $i++): ?>
+                  <?php for ($i = 1; $i <= 10; $i++): ?>
                     <option value="<?php echo $i; ?>" <?php echo (($_POST['nb_personnes'] ?? '') == $i) ? 'selected' : ''; ?>>
                       <?php echo $i; ?> <?php echo $i === 1 ? 'personne' : 'personnes'; ?>
                     </option>
@@ -224,9 +271,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="type_chambre">Type de chambre *</label>
                 <select class="form-control" id="type_chambre" name="type_chambre" required>
                   <option value="">Choisir...</option>
-                  <option value="bungalow" <?php echo (($_POST['type_chambre'] ?? '') === 'Bungalow sur pilotis') ? 'selected' : ''; ?>>Bungalow sur pilotis</option>
-                  <option value="villa" <?php echo (($_POST['type_chambre'] ?? '') === 'Villa sur la plage') ? 'selected' : ''; ?>>Villa sur la plage</option>
-                  <option value="suite" <?php echo (($_POST['type_chambre'] ?? '') === 'Suite avec piscine privée') ? 'selected' : ''; ?>>Suite avec piscine privée</option>
+                  <option value="bungalow" <?php echo (($_POST['type_chambre'] ?? '') === 'bungalow') ? 'selected' : ''; ?>>Bungalow sur pilotis</option>
+                  <option value="villa" <?php echo (($_POST['type_chambre'] ?? '') === 'villa') ? 'selected' : ''; ?>>Villa sur la plage</option>
+                  <option value="suite" <?php echo (($_POST['type_chambre'] ?? '') === 'suite') ? 'selected' : ''; ?>>Suite avec piscine privée</option>
                 </select>
               </div>
 
@@ -234,27 +281,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label>Activités souhaitées</label>
                 <div class="checkbox-group">
                   <?php
-                  $selectedActivities = $_POST['activites'] ?? [];
-                  $listeActivites = [
-                    "Plongée sous-marine",
-                    "Sortie en bateau",
-                    "Paddle / Kayak",
-                    "Yoga au lever du soleil",
-                    "Observation des tortues",
-                    "Tennis tropical"
-                  ];
-                  foreach ($listeActivites as $activite):
-                  ?>
-                    <label class="checkbox-item">
-                      <input
-                        type="checkbox"
-                        name="activites[]"
-                        value="<?php echo htmlspecialchars($activite); ?>"
-                        <?php echo in_array($activite, $selectedActivities) ? 'checked' : ''; ?>
-                      >
-                      <?php echo htmlspecialchars($activite); ?>
-                    </label>
-                  <?php endforeach; ?>
+                    $selectedActivities = $_POST['activites'] ?? [];
+                    foreach ($activitiesData as $activite):
+                    ?>
+                      <label class="checkbox-item">
+                        <input
+                          type="checkbox"
+                          name="activites[]"
+                          value="<?php echo htmlspecialchars($activite['id']); ?>"
+                          <?php echo in_array((string)$activite['id'], array_map('strval', $selectedActivities)) ? 'checked' : ''; ?>
+                        >
+                        <?php echo htmlspecialchars($activite['nom']); ?>
+                        <small class="d-block text-muted">
+                          Min: <?php echo (int)$activite['min_participants']; ?> /
+                          Max: <?php echo (int)$activite['max_participants']; ?> personnes
+                        </small>
+                      </label>
+                    <?php endforeach; ?>
                 </div>
               </div>
 
@@ -295,8 +338,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <h2 class="ftco-heading-2">Liens utiles</h2>
           <ul class="list-unstyled">
             <li><a href="index.php" class="py-2 d-block">Accueil</a></li>
-            <li><a href="activites.php" class="py-2 d-block">Activités</a></li>
-            <li><a href="reservation.php" class="py-2 d-block">Réserver</a></li>
+            <li><a href="Activites.php" class="py-2 d-block">Activités</a></li>
+            <li><a href="Reservation.php" class="py-2 d-block">Réserver</a></li>
             <li><a href="Connexion.php" class="py-2 d-block">Connexion</a></li>
           </ul>
         </div>
