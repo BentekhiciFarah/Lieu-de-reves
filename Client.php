@@ -3,6 +3,9 @@ session_start();
 // Inclure les fonctions de gestion des données JSON
 require_once "includes/json_data.php";
 
+require_once "includes/json_data.php";
+require_once "facture.php";
+
 // Vérification connexion
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== "client") {
     // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté ou n'est pas un client
@@ -12,10 +15,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "client") {
 // Récupérer l'email de l'utilisateur connecté
 $email = $_SESSION['email'] ?? '';
 
-// Charger les réservations
 $reservations = readJson("reservation.json") ?: [];
-// Charger les prestations déjà choisies par l'utilisateur
 $prestations_client = readJson("prestations_client.json") ?: [];
+$roomTypes = readJson("room_types.json") ?: [];
 ?>
 
 <!DOCTYPE html>
@@ -36,18 +38,23 @@ $prestations_client = readJson("prestations_client.json") ?: [];
     $found = false;
     $hasValidReservation = false; // Pour afficher la section prestations uniquement si une réservation est validée
 
-    // Afficher les réservations de l'utilisateur connecté
+    // Parcourir les réservations pour trouver celles de l'utilisateur connecté
     foreach ($reservations as $res):
-        // Vérifier si la réservation appartient à l'utilisateur connecté
-        if (($res['email'] ?? '') === $email):
-            $found = true;
-            if ($res['statut'] === 'validée') $hasValidReservation = true;
+    // Vérifier si la réservation appartient à l'utilisateur connecté
+    if (($res['email'] ?? '') === $email):
+        $found = true;
+        if ($res['statut'] === 'validée') $hasValidReservation = true;
 
-            // Récupérer les prestations liées à cette réservation
-            $resPrestations = array_values(array_filter($prestations_client, function($p) use ($email, $res){
-                return $p['user_email'] === $email && $p['reservation_id'] == $res['id'];
-            }));
-    ?>
+        // Récupérer les prestations liées à cette réservation
+        $resPrestations = array_values(array_filter($prestations_client, function($p) use ($email, $res){
+            return $p['user_email'] === $email && $p['reservation_id'] == $res['id'];
+        }));
+
+        $facture = null;
+        if (($res['statut'] ?? '') === 'validée') {
+            $facture = calculerFactureReservation($res, $roomTypes, $prestations_client);
+        }
+?>
 
         <div class="card mb-3">
             <div class="card-body">
@@ -82,6 +89,31 @@ $prestations_client = readJson("prestations_client.json") ?: [];
                 <?php endif; ?>
             </div>
         </div>
+
+            <?php if ($facture): ?>
+        <hr>
+        <h5>Facture prévisionnelle</h5>
+        <table class="table table-bordered table-sm bg-white">
+            <thead class="table-light">
+                <tr>
+                    <th>Désignation</th>
+                    <th>Montant</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($facture['lignes'] as $ligne): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($ligne['label']) ?></td>
+                        <td><?= number_format($ligne['montant'], 2, ',', ' ') ?> €</td>
+                    </tr>
+                <?php endforeach; ?>
+                <tr class="table-secondary">
+                    <th>Total prévisionnel</th>
+                    <th><?= number_format($facture['total'], 2, ',', ' ') ?> €</th>
+                </tr>
+            </tbody>
+        </table>
+    <?php endif; ?>
 
     <?php
         endif;

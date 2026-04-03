@@ -123,9 +123,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
                     }
                 }
 
-            } elseif ($action === 'refuser') {
+                        } elseif ($action === 'refuser') {
                 $res['statut'] = 'refusée';
                 $messageAdmin = "Réservation refusée pour {$res['nom']} ({$res['email']}).";
+
+            } elseif ($action === 'maj_arrhes') {
+                $montantArrhes = (float)($_POST['arrhes'] ?? 0);
+
+                if ($montantArrhes < 0) {
+                    $montantArrhes = 0;
+                }
+
+                $res['arrhes'] = $montantArrhes;
+                $messageAdmin = "Arrhes enregistrées pour {$res['nom']} ({$res['email']}) : {$montantArrhes} €.";
+
+            } elseif ($action === 'maj_reduction') {
+                $reduction = (int)($_POST['reduction_prestations'] ?? 0);
+
+                if (!in_array($reduction, [0, 10, 20, 50])) {
+                    $reduction = 0;
+                }
+
+                $res['reduction_prestations'] = $reduction;
+                $messageAdmin = "Réduction sur prestations enregistrée pour {$res['nom']} ({$res['email']}) : -{$reduction}%";
             }
 
             break;
@@ -210,12 +230,18 @@ $chambresReservees = [
     "suite" => 0
 ];
 foreach ($reservations as $r) {
-    if (
-        isset($r['type_chambre'], $r['statut']) &&
-        $r['statut'] === 'validée' &&
-        isset($chambresReservees[$r['type_chambre']])
-    ) {
-        $chambresReservees[$r['type_chambre']]++;
+    $type = strtolower(trim($r['type_chambre'] ?? ''));
+
+    if ($type === 'bungalow sur pilotis' || $type === 'bungalow') {
+        $type = 'bungalow';
+    } elseif ($type === 'villa sur la plage' || $type === 'villa') {
+        $type = 'villa';
+    } elseif ($type === 'suite avec piscine privée' || $type === 'suite') {
+        $type = 'suite';
+    }
+
+    if (($r['statut'] ?? '') === 'validée' && isset($chambresReservees[$type])) {
+        $chambresReservees[$type]++;
     }
 }
 ?>
@@ -401,7 +427,76 @@ foreach ($reservations as $r) {
         </div>
     <?php endif; ?>
 
-</div>
+
+    <h3>Réservations validées</h3>
+    <?php
+    $valides = false;
+    foreach ($reservations as $res):
+        if (($res['statut'] ?? '') === 'validée'):
+            $valides = true;
+
+            $arrhes = (float)($res['arrhes'] ?? 0);
+            $reductionPrestations = (int)($res['reduction_prestations'] ?? 0);
+    ?>
+        <div class="card mb-3">
+            <div class="card-body">
+                <p><strong>Nom :</strong> <?= htmlspecialchars($res['nom'] ?? '') ?></p>
+                <p><strong>Email :</strong> <?= htmlspecialchars($res['email'] ?? '') ?></p>
+                <p><strong>Dates :</strong> <?= htmlspecialchars($res['date_debut'] ?? '') ?> → <?= htmlspecialchars($res['date_fin'] ?? '') ?></p>
+                <p><strong>Type chambre :</strong> <?= htmlspecialchars($res['type_chambre'] ?? '') ?></p>
+                <p><strong>Nombre de personnes :</strong> <?= htmlspecialchars($res['nb_personnes'] ?? '') ?></p>
+                <p><strong>Enregistrer l'avance :</strong> <?= number_format($arrhes, 2, ',', ' ') ?> €</p>
+                <p><strong>Réduction actuelle sur prestations :</strong> <?= $reductionPrestations ?> %</p>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <form action="Admin.php" method="POST" class="border rounded p-3 bg-light mb-2">
+                            <input type="hidden" name="reservation_id" value="<?= htmlspecialchars($res['id']) ?>">
+                            <label class="form-label"><strong>Enregistrer l'avance</strong></label>
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                name="arrhes"
+                                class="form-control mb-2"
+                                value="<?= htmlspecialchars($arrhes) ?>"
+                            >
+                            <button type="submit" name="action" value="maj_arrhes" class="btn btn-primary btn-sm">
+                                Enregistrer l'avance
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="col-md-6">
+                        <form action="Admin.php" method="POST" class="border rounded p-3 bg-light mb-2">
+                            <input type="hidden" name="reservation_id" value="<?= htmlspecialchars($res['id']) ?>">
+                            <label class="form-label"><strong>Réduction sur prestations</strong></label>
+                            <select name="reduction_prestations" class="form-select mb-2">
+                                <option value="0" <?= ($reductionPrestations === 0) ? 'selected' : '' ?>>0%</option>
+                                <option value="10" <?= ($reductionPrestations === 10) ? 'selected' : '' ?>>10%</option>
+                                <option value="20" <?= ($reductionPrestations === 20) ? 'selected' : '' ?>>20%</option>
+                                <option value="50" <?= ($reductionPrestations === 50) ? 'selected' : '' ?>>50%</option>
+                            </select>
+                            <button type="submit" name="action" value="maj_reduction" class="btn btn-warning btn-sm">
+                                Enregistrer réduction
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php
+        endif;
+    endforeach;
+    ?>
+
+    <?php if (!$valides): ?>
+        <div class="alert alert-secondary">
+            Aucune réservation validée.
+        </div>
+    <?php endif; ?>
+
+    <hr class="my-4">
 
 </body>
 </html>

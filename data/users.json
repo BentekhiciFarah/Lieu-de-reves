@@ -77,5 +77,13 @@
         "email": "amine@gmail.com",
         "password": "$2y$10$mQ\/O\/X9HoZNoz4TGR8mLJe7cvGB37xX4UVMM9a1SrYWcIYwn6w1m6",
         "role": "client"
+    },
+    {
+        "id": "17752311669107",
+        "nom": "amine",
+        "prenom": "",
+        "email": "az@gmail.com",
+        "password": "$2y$10$Xs1W1Te7oQrjlmo13pLIZuAmS1gOz9Q0BvbmXHyj6TEFolWP\/QnkK",
+        "role": "client"
     }
 ]
