@@ -198,7 +198,7 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
 // Met à jour la liste des prestations et la facture d'une réservation sans rechargement
 function updateReservationCard(reservationId) {
     $.ajax({
-        url: 'get_invoice.php',
+        url: 'recuperer_facture.php',
         method: 'GET',
         data: { reservation_id: reservationId },
         dataType: 'json',
@@ -242,7 +242,7 @@ function updateReservationCard(reservationId) {
 // Charge et affiche les activités planifiées d'une réservation
 function loadPlannedActivities(reservationId) {
     $.ajax({
-        url: 'get_client_activities.php',
+        url: 'recuperer_client_activites.php',
         method: 'GET',
         data: { reservation_id: reservationId },
         dataType: 'json',
@@ -313,7 +313,7 @@ $(document).ready(function(){
         btn.prop('disabled', true);
 
         $.ajax({
-            url: 'add_activity_request.php',
+            url: 'ajouter_demande_activite.php',
             method: 'POST',
             data: form.serialize() + '&reservation_id=' + reservationId,
             dataType: 'json',
@@ -340,7 +340,7 @@ $(document).ready(function(){
         var resId     = form.closest('[id^="planned_activities_"]').attr('id').replace('planned_activities_', '');
 
         $.ajax({
-            url: 'add_activity_message.php',
+            url: 'ajouter_activite_message.php',
             method: 'POST',
             data: { planned_id: plannedId, message: message },
             dataType: 'json',
@@ -357,7 +357,7 @@ $(document).ready(function(){
 
     // Charger le catalogue des prestations disponibles via AJAX
     $.ajax({
-        url: 'get_prestations.php',
+        url: 'recuperer_prestations.php',
         method: 'GET',
         dataType: 'json',
         success: function(data) {
@@ -376,13 +376,13 @@ $(document).ready(function(){
     });
 
     // Ajouter une prestation via AJAX et mettre à jour la carte sans rechargement
-    $(document).on('click', '.add-prestation', function() {
+    $(document).on('click', '.ajouter-prestation', function() {
         var btn          = $(this);
         var prestationId = btn.data('id');
         btn.prop('disabled', true);
 
         $.ajax({
-            url: 'add_prestation.php',
+            url: 'ajouter_prestation.php',
             method: 'POST',
             data: { id: prestationId },
             dataType: 'json',

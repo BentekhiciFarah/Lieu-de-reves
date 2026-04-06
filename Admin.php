@@ -762,7 +762,7 @@ $(document).ready(function(){
             return;
         }
         $.ajax({
-            url: 'get_activity_requests_by_date.php',
+            url: 'recuperer_activites_par_date.php',
             method: 'GET',
             data: { date: date },
             dataType: 'json',
