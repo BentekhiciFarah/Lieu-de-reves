@@ -185,51 +185,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
     exit;
 }
 
-
-// AJAX pour mise à jour du statut prestation
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['prestation_id'], $_POST['action']) 
-    && isset($_SERVER['HTTP_X_REQUESTED_WITH']) 
-    && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-
-    $prestationId = $_POST['prestation_id'];
-    $action = $_POST['action'];
-    $adresse = $_POST['adresse'] ?? '';
-    $heure = $_POST['heure'] ?? '';
-
-    $prestations_client = readJson("prestations_client.json") ?: [];
-    $updated = false;
-    $nouveau_statut = '';
-
-    foreach ($prestations_client as &$pc) {
-        if (($pc['prestation']['id'] ?? '') == $prestationId) {
-            if ($action === 'valider') {
-                $pc['statut'] = 'validée';
-                $pc['adresse'] = $adresse;
-                $pc['heure'] = $heure;
-                $nouveau_statut = 'validée';
-                $updated = true;
-                $message = "Prestation validée";
-            } elseif ($action === 'refuser') {
-                $pc['statut'] = 'refusée';
-                $pc['adresse'] = '';
-                $pc['heure'] = '';
-                $nouveau_statut = 'refusée';
-                $updated = true;
-                $message = "Prestation refusée";
-            }
-            break;
-        }
-    }
-    unset($pc);
-
-    if ($updated) {
-        writeJson("prestations_client.json", $prestations_client);
-        echo json_encode(["success" => true, "message" => $message, "nouveau_statut" => $nouveau_statut]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Prestation introuvable"]);
-    }
-    exit; // terminer le script pour AJAX
-}
 // Nombre total de chambres
 $chambresDisponibles = [
     "bungalow" => 5,
@@ -250,8 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['section']) && $_GET['se
     exit;
 }
 
-// Lecture des prestations clients
-$prestations_client = readJson("prestations_client.json") ?: [];
+
 
 // Lecture des animateurs pour la planification des activités
 $animateurs = readJson("animateurs.json") ?: [];
@@ -472,35 +426,6 @@ $(document).ready(function(){
         });
     });
 
-    // --- Formulaires validation/refus de prestations ---
-    $(document).on('submit', '.prestation-form', function(e) {
-        e.preventDefault();
-        var form        = $(this);
-        var prestationId = form.find('input[name="prestation_id"]').val();
-        var action      = lastClickedAction;
-        var adresse     = form.find('input[name="adresse"]').val();
-        var heure       = form.find('input[name="heure"]').val();
-
-        $.ajax({
-            url: 'Admin.php',
-            method: 'POST',
-            dataType: 'json',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            data: { prestation_id: prestationId, action: action, adresse: adresse, heure: heure },
-            success: function(res) {
-                showMessage(res.message, res.success ? 'success' : 'danger');
-                if (res.success) {
-                    form.closest('.card').fadeOut(400, function() {
-                        $(this).remove();
-                        if ($('#prestationsContainer .card').length === 0) {
-                            $('#prestationsContainer').html('<div class="alert alert-secondary">Aucune demande de prestation en attente.</div>');
-                        }
-                    });
-                }
-            },
-            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
-        });
-    });
 });
 </script>
 <body class="p-4 bg-light">
@@ -597,59 +522,6 @@ $(document).ready(function(){
     <?php endif; ?>
     </div><!-- #pendingContainer -->
 
-    <hr class="my-4">
-
-    <!-- Affichage des prestations en attente -->
-    <h3>Demandes de prestations / activités en attente</h3>
-    <div id="prestationsContainer">
-    <?php
-        $prestationsEnAttente = false;
-    // Parcours des prestations demandées par les clients
-    foreach ($prestations_client as &$pc):
-        // Correction : accepter à la fois 'attente' et 'en_attente'
-        if (in_array($pc['statut'] ?? '', ['attente', 'en_attente'])):
-            $prestationsEnAttente = true;
-
-            // Récupérer les valeurs existantes pour éviter les erreurs
-            $prestationId = $pc['prestation']['id'] ?? '';
-            $adresse = $pc['adresse'] ?? '';
-            $heure = $pc['heure'] ?? '';
-    ?>
-        <div class="card mb-3">
-            <div class="card-body">
-
-                <p><strong>Client :</strong> <?= htmlspecialchars($pc['user_email'] ?? 'Email inconnu') ?></p>
-                <p><strong>Prestation :</strong> <?= htmlspecialchars($pc['prestation']['name'] ?? 'Nom inconnu') ?></p>
-                <p><strong>Description :</strong> <?= htmlspecialchars($pc['prestation']['description'] ?? '') ?></p>
-
-                <!-- Formulaire pour que l'admin valide ou refuse -->
-                <form class="d-inline prestation-form">
-                    <input type="hidden" name="prestation_id" value="<?= htmlspecialchars($prestationId) ?>">
-                    <div class="mb-2">
-                        <label for="adresse_<?= $prestationId ?>">Adresse :</label>
-                        <input type="text" id="adresse_<?= $prestationId ?>" name="adresse" value="<?= htmlspecialchars($adresse) ?>" class="form-control" required>
-                    </div>
-                    <div class="mb-2">
-                        <label for="heure_<?= $prestationId ?>">Heure :</label>
-                        <input type="time" id="heure_<?= $prestationId ?>" name="heure" value="<?= htmlspecialchars($heure) ?>" class="form-control" required>
-                    </div>
-                    <button type="submit" name="action" value="valider" class="btn btn-success btn-sm">Valider</button>
-                    <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm">Refuser</button>
-                </form>
-            </div>
-        </div>
-    <?php
-        endif;
-    endforeach;
-    unset($pc);
-    ?>
-
-    <?php if (!$prestationsEnAttente): ?>
-        <div class="alert alert-secondary">
-            Aucune demande de prestation en attente.
-        </div>
-    <?php endif; ?>
-    </div><!-- #prestationsContainer -->
 
     <hr class="my-4">
 
@@ -762,9 +634,9 @@ $(document).ready(function(){
             return;
         }
         $.ajax({
-            url: 'recuperer_activites_par_date.php',
+            url: 'includes/api/activite.php',
             method: 'GET',
-            data: { date: date },
+            data: { action: 'par_date', date: date },
             dataType: 'json',
             success: function(requests) {
                 renderActivityRequests(requests, date);
@@ -787,10 +659,10 @@ $(document).ready(function(){
             return;
         }
 
-        var data = form.serialize() + '&activity_id=' + activityId + '&date=' + encodeURIComponent(date);
+        var data = form.serialize() + '&activity_id=' + activityId + '&date=' + encodeURIComponent(date) + '&action=planifier';
 
         $.ajax({
-            url: 'plan_activity.php',
+            url: 'includes/api/activite.php',
             method: 'POST',
             dataType: 'json',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },

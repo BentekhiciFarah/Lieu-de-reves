@@ -1,22 +1,23 @@
 [
     {
         "id": 1,
-        "name": "Bungalow de luxe",
-        "description": "Bengalow spacieux avec une terrasse privée et une vue imprenable sur la mer.",
-        "price_per_night": 200
+        "type": "bungalow",
+        "nom": "Bungalow de luxe",
+        "description": "Bungalow spacieux avec une terrasse privée et une vue imprenable sur la mer.",
+        "prix_par_nuit": 200
     },
-
     {
-
         "id": 2,
-        "name": "Villa sur la plage",
+        "type": "villa",
+        "nom": "Villa sur la plage",
         "description": "Villa élégante avec accès direct à la plage, piscine privée et jardin luxuriant.",
-        "price_per_night": 400
+        "prix_par_nuit": 400
     },
     {
         "id": 3,
-        "name": "Suite avec piscine privée",
+        "type": "suite",
+        "nom": "Suite avec piscine privée",
         "description": "Suite luxueuse avec piscine privée, jacuzzi et vue panoramique sur l'océan.",
-        "price_per_night": 350
+        "prix_par_nuit": 350
     }
 ]

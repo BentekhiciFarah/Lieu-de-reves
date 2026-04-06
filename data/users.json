@@ -101,5 +101,21 @@
         "email": "ax@gmail.com",
         "password": "$2y$10$x8FbR5b3MdN6UBQvLe1GKOwX0XeE4RWu2qf1mHju727nD9jBD3uJe",
         "role": "client"
+    },
+    {
+        "id": "17755142205824",
+        "nom": "amine",
+        "prenom": "",
+        "email": "Aze@gmail.com",
+        "password": "$2y$10$\/Ieve2kUljaqJG4.M3Y.gecqVklOgQ6HQGNBemPA50swERaJU5Hf6",
+        "role": "client"
+    },
+    {
+        "id": "17755152955329",
+        "nom": "az",
+        "prenom": "",
+        "email": "za@gmail.com",
+        "password": "$2y$10$6fxFu9Yfm29ro4ImrqSxBOjV8gmkH88IWRmSXq7O4llDeSucho1vy",
+        "role": "client"
     }
 ]

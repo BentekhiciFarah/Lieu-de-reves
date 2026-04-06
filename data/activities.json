@@ -2,30 +2,55 @@
     {
         "id": 1,
         "nom": "Plongée sous-marine",
-        "description": "Découvrez les merveilles sous-marines avec notre activité de plongée sous-marine. Explorez les récifs coralliens, nagez aux côtés de poissons colorés et admirez la beauté de la vie marine. Que vous soyez débutant ou plongeur expérimenté, nos instructeurs qualifiés vous guideront à travers une expérience inoubliable dans les eaux cristallines.",
+        "description": "Découvrez les merveilles sous-marines avec notre activité de plongée sous-marine. Explorez les récifs coralliens, nagez aux côtés de poissons colorés et admirez la beauté de la vie marine.",
         "duree": "2 heures",
         "prix": 90,
         "min_participants": 2,
         "max_participants": 6
     },
-
     {
         "id": 2,
         "nom": "Sortie en bateau",
-        "description": "Embarquez pour une aventure en mer avec notre activité de sortie en bateau. Profitez d'une journée de détente sur l'eau, explorez les côtes pittoresques et découvrez des criques cachées. Que vous souhaitiez faire du snorkeling, pêcher ou simplement vous détendre au soleil, notre sortie en bateau est l'occasion parfaite de profiter de la beauté de la mer et de créer des souvenirs inoubliables.",
+        "description": "Embarquez pour une aventure en mer. Profitez d'une journée de détente sur l'eau, explorez les côtes pittoresques et découvrez des criques cachées.",
         "duree": "4 heures",
         "prix": 100,
-        "min_participants": 1,
+        "min_participants": 6,
         "max_participants": 10
     },
-
     {
         "id": 3,
-        "nom": "Kayak/ Canoë",
-        "description": "Partez à l'aventure avec notre activité de kayak/canoë. Navigatez sur les eaux calmes, découvrez des paysages pittoresques et profitez d'une journée inoubliable sur l'eau. Que vous soyez un débutant ou un pratiquant expérimenté, nos instructeurs qualifiés vous accompagneront pour une expérience sécurisée et enrichissante.",
-        "duree": "4 heures",
-        "prix": 100,
+        "nom": "Paddle / Kayak",
+        "description": "Glissez sur les eaux turquoise du lagon et profitez d'un moment sportif et apaisant, libre ou accompagné d'un moniteur.",
+        "duree": "2 heures",
+        "prix": 50,
+        "min_participants": 1,
+        "max_participants": 8
+    },
+    {
+        "id": 4,
+        "nom": "Yoga au lever du soleil",
+        "description": "Commencez la journée avec une séance de yoga face à la mer dans une ambiance calme et ressourçante.",
+        "duree": "Demi-journée",
+        "prix": 40,
+        "min_participants": 1,
+        "max_participants": 12
+    },
+    {
+        "id": 5,
+        "nom": "Observation des tortues",
+        "description": "Vivez une expérience magique en observant les tortues marines dans leur environnement naturel accompagné d'un guide.",
+        "duree": "Journée",
+        "prix": 70,
         "min_participants": 2,
         "max_participants": 8
+    },
+    {
+        "id": 6,
+        "nom": "Tennis tropical",
+        "description": "Profitez d'un match de tennis dans un cadre tropical unique, avec ou sans arbitre.",
+        "duree": "1 heure",
+        "prix": 30,
+        "min_participants": 2,
+        "max_participants": 4
     }
 ]

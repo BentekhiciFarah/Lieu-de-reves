@@ -194,5 +194,33 @@
         "statut": "en_attente",
         "adresse": "",
         "heure": ""
+    },
+    {
+        "user_email": "za@gmail.com",
+        "reservation_id": "17755152569537",
+        "prestation": {
+            "id": 2,
+            "name": "Petit d\u00e9jeuner en chambre",
+            "description": "Service de petit d\u00e9jeuner livr\u00e9 directement dans la chambre.",
+            "price": 20,
+            "type_tarification": "par_personne"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
+    },
+    {
+        "user_email": "za@gmail.com",
+        "reservation_id": "17755152569537",
+        "prestation": {
+            "id": 3,
+            "name": "Diner tropical",
+            "description": "Un d\u00e9licieux diner sur la plage avec un menu de sp\u00e9cialit\u00e9s locales.",
+            "price": 100,
+            "type_tarification": "par_personne"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
     }
 ]

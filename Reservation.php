@@ -2,94 +2,7 @@
 session_start();
 require_once "includes/json_data.php";
 
-$successMessage = "";
-$errorMessage = "";
-
 $activitiesData = readJson("activities.json") ?: [];
-$activitesChoisies = $_POST['activites'] ?? [];
-$nbPersonnes = (int)($_POST['nb_personnes'] ?? 0);
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = trim($_POST['nom'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $dateDebut = $_POST['date_debut'] ?? '';
-    $dateFin = $_POST['date_fin'] ?? '';
-    $nbPersonnes = $_POST['nb_personnes'] ?? '';
-    $typeChambre = $_POST['type_chambre'] ?? '';
-    $activites = $_POST['activites'] ?? [];
-    $message = trim($_POST['message'] ?? '');
-
-$activitiesData = readJson("activities.json") ?: [];
-$activites = $_POST['activites'] ?? [];
-
-if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChambre) {
-    $errorMessage = "Veuillez remplir tous les champs obligatoires.";
-} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errorMessage = "Adresse email invalide.";
-} elseif ($dateFin < $dateDebut) {
-    $errorMessage = "La date de fin doit être postérieure ou égale à la date de début.";
-} elseif ($dateDebut < date('Y-m-d')) {
-    $errorMessage = "La date de début ne peut pas être dans le passé.";
-} elseif ($nbPersonnes < 1) {
-    $errorMessage = "Le nombre de personnes doit être supérieur à 0.";
-} else {
-    foreach ($activites as $activiteId) {
-        $activiteTrouvee = false;
-
-        foreach ($activitiesData as $activity) {
-            if ((string)$activity['id'] === (string)$activiteId) {
-                $activiteTrouvee = true;
-
-                $nomActivite = $activity['nom'] ?? 'Activité';
-                $minParticipants = (int)($activity['min_participants'] ?? 1);
-                $maxParticipants = (int)($activity['max_participants'] ?? PHP_INT_MAX);
-
-                if ($nbPersonnes < $minParticipants) {
-                    $errorMessage = "L'activité \"{$nomActivite}\" nécessite au minimum {$minParticipants} participants.";
-                } elseif ($nbPersonnes > $maxParticipants) {
-                    $errorMessage = "L'activité \"{$nomActivite}\" accepte au maximum {$maxParticipants} participants.";
-                }
-
-                break;
-            }
-        }
-
-        if (!$activiteTrouvee) {
-            $errorMessage = "Une activité sélectionnée est invalide.";
-        }
-
-        if (!empty($errorMessage)) {
-            break;
-        }
-    }
-
-    if (empty($errorMessage)) {
-        $reservations = readJson("reservation.json") ?: [];
-
-        $id = generateId();
-
-        $nouvelleReservation = [
-            "id" => $id,
-            "nom" => $nom,
-            "email" => $email,
-            "date_debut" => $dateDebut,
-            "date_fin" => $dateFin,
-            "nb_personnes" => $nbPersonnes,
-            "type_chambre" => $typeChambre,
-            "activites" => $activites,
-            "message" => $message,
-            "statut" => "en_attente",
-            "date_creation" => date("Y-m-d H:i:s")
-        ];
-
-        $reservations[] = $nouvelleReservation;
-
-        writeJson("reservation.json", $reservations);
-
-        $successMessage = "Votre demande de réservation a été envoyée. L’administrateur la validera prochainement.";
-    }
-}
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -221,38 +134,28 @@ if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChamb
             <p>Remplissez ce formulaire pour envoyer votre demande à l’administrateur.</p>
           </div>
 
-          <?php if (!empty($successMessage)): ?>
-            <div class="alert alert-success">
-              <?php echo htmlspecialchars($successMessage); ?>
-            </div>
-          <?php endif; ?>
+          <div id="reservationMessage" class="d-none mb-3"></div>
 
-          <?php if (!empty($errorMessage)): ?>
-            <div class="alert alert-danger">
-              <?php echo htmlspecialchars($errorMessage); ?>
-            </div>
-          <?php endif; ?>
-
-          <form method="POST" action="Reservation.php">
+          <form id="reservationForm">
             <div class="row">
               <div class="col-md-6 mb-3">
                 <label for="nom">Nom complet *</label>
-                <input type="text" class="form-control" id="nom" name="nom" required value="<?php echo htmlspecialchars($_POST['nom'] ?? ''); ?>">
+                <input type="text" class="form-control" id="nom" name="nom" required>
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="email">Adresse email *</label>
-                <input type="email" class="form-control" id="email" name="email" required value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+                <input type="email" class="form-control" id="email" name="email" required>
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="date_debut">Date de début *</label>
-                <input type="date" class="form-control" id="date_debut" name="date_debut" required value="<?php echo htmlspecialchars($_POST['date_debut'] ?? ''); ?>">
+                <input type="date" class="form-control" id="date_debut" name="date_debut" required>
               </div>
 
               <div class="col-md-6 mb-3">
                 <label for="date_fin">Date de fin *</label>
-                <input type="date" class="form-control" id="date_fin" name="date_fin" required value="<?php echo htmlspecialchars($_POST['date_fin'] ?? ''); ?>">
+                <input type="date" class="form-control" id="date_fin" name="date_fin" required>
               </div>
 
               <div class="col-md-6 mb-3">
@@ -260,7 +163,7 @@ if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChamb
                 <select class="form-control" id="nb_personnes" name="nb_personnes" required>
                   <option value="">Choisir...</option>
                   <?php for ($i = 1; $i <= 10; $i++): ?>
-                    <option value="<?php echo $i; ?>" <?php echo (($_POST['nb_personnes'] ?? '') == $i) ? 'selected' : ''; ?>>
+                    <option value="<?php echo $i; ?>">
                       <?php echo $i; ?> <?php echo $i === 1 ? 'personne' : 'personnes'; ?>
                     </option>
                   <?php endfor; ?>
@@ -271,26 +174,22 @@ if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChamb
                 <label for="type_chambre">Type de chambre *</label>
                 <select class="form-control" id="type_chambre" name="type_chambre" required>
                   <option value="">Choisir...</option>
-                  <option value="bungalow" <?php echo (($_POST['type_chambre'] ?? '') === 'bungalow') ? 'selected' : ''; ?>>Bungalow sur pilotis</option>
-                  <option value="villa" <?php echo (($_POST['type_chambre'] ?? '') === 'villa') ? 'selected' : ''; ?>>Villa sur la plage</option>
-                  <option value="suite" <?php echo (($_POST['type_chambre'] ?? '') === 'suite') ? 'selected' : ''; ?>>Suite avec piscine privée</option>
+                  <option value="bungalow">Bungalow sur pilotis</option>
+                  <option value="villa">Villa sur la plage</option>
+                  <option value="suite">Suite avec piscine privée</option>
                 </select>
               </div>
 
               <div class="col-12 mb-3">
                 <label>Activités souhaitées</label>
                 <div class="checkbox-group">
-                  <?php
-                    $selectedActivities = $_POST['activites'] ?? [];
-                    foreach ($activitiesData as $activite):
-                    ?>
+                  <?php foreach ($activitiesData as $activite): ?>
                       <label class="checkbox-item">
                         <input
                           type="checkbox"
                           name="activites[]"
                           value="<?php echo htmlspecialchars($activite['id']); ?>"
-                          <?php echo in_array((string)$activite['id'], array_map('strval', $selectedActivities)) ? 'checked' : ''; ?>
-                        >
+                          >
                         <?php echo htmlspecialchars($activite['nom']); ?>
                         <small class="d-block text-muted">
                           Min: <?php echo (int)$activite['min_participants']; ?> /
@@ -303,11 +202,11 @@ if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChamb
 
               <div class="col-12 mb-4">
                 <label for="message">Message</label>
-                <textarea class="form-control" id="message" name="message" placeholder="Précisez vos souhaits, préférences ou informations complémentaires..."><?php echo htmlspecialchars($_POST['message'] ?? ''); ?></textarea>
+                <textarea class="form-control" id="message" name="message" placeholder="Précisez vos souhaits, préférences ou informations complémentaires..."></textarea>
               </div>
 
               <div class="col-12 text-center">
-                <button type="submit" class="btn btn-primary py-3 px-5">
+                <button type="submit" id="submitBtn" class="btn btn-primary py-3 px-5">
                   Envoyer ma demande
                 </button>
               </div>
@@ -380,6 +279,46 @@ if (!$nom || !$email || !$dateDebut || !$dateFin || !$nbPersonnes || !$typeChamb
 <script src="js/jquery.timepicker.min.js"></script>
 <script src="js/scrollax.min.js"></script>
 <script src="js/main.js"></script>
+
+<script>
+$(document).ready(function () {
+    $('#reservationForm').on('submit', function (e) {
+        e.preventDefault();
+
+        var btn = $('#submitBtn');
+        btn.prop('disabled', true).text('Envoi en cours…');
+
+        var msgDiv = $('#reservationMessage');
+        msgDiv.addClass('d-none').removeClass('alert-success alert-danger').text('');
+
+        $.ajax({
+            url: 'includes/api/reservation.php',
+            method: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function (res) {
+                msgDiv
+                    .removeClass('d-none')
+                    .addClass(res.success ? 'alert alert-success' : 'alert alert-danger')
+                    .text(res.message);
+
+                if (res.success) {
+                    $('#reservationForm')[0].reset();
+                }
+            },
+            error: function () {
+                msgDiv
+                    .removeClass('d-none')
+                    .addClass('alert alert-danger')
+                    .text('Une erreur est survenue, veuillez réessayer.');
+            },
+            complete: function () {
+                btn.prop('disabled', false).text('Envoyer ma demande');
+            }
+        });
+    });
+});
+</script>
 
 </body>
 </html>

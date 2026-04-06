@@ -4,7 +4,7 @@ session_start();
 require_once "includes/json_data.php";
 
 require_once "includes/json_data.php";
-require_once "facture.php";
+require_once "includes/api/facture.php";
 
 // Vérification connexion
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== "client") {
@@ -198,9 +198,9 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
 // Met à jour la liste des prestations et la facture d'une réservation sans rechargement
 function updateReservationCard(reservationId) {
     $.ajax({
-        url: 'recuperer_facture.php',
+        url: 'includes/api/facture.php',
         method: 'GET',
-        data: { reservation_id: reservationId },
+        data: { action: 'detail', reservation_id: reservationId },
         dataType: 'json',
         success: function(res) {
             if (!res.success) return;
@@ -242,9 +242,9 @@ function updateReservationCard(reservationId) {
 // Charge et affiche les activités planifiées d'une réservation
 function loadPlannedActivities(reservationId) {
     $.ajax({
-        url: 'recuperer_client_activites.php',
+        url: 'includes/api/activite.php',
         method: 'GET',
-        data: { reservation_id: reservationId },
+        data: { action: 'client', reservation_id: reservationId },
         dataType: 'json',
         success: function(activities) {
             var container = $('#planned_activities_' + reservationId);
@@ -313,9 +313,9 @@ $(document).ready(function(){
         btn.prop('disabled', true);
 
         $.ajax({
-            url: 'ajouter_demande_activite.php',
+            url: 'includes/api/activite.php',
             method: 'POST',
-            data: form.serialize() + '&reservation_id=' + reservationId,
+            data: form.serialize() + '&reservation_id=' + reservationId + '&action=demande',
             dataType: 'json',
             success: function(res) {
                 alert(res.message);
@@ -340,9 +340,9 @@ $(document).ready(function(){
         var resId     = form.closest('[id^="planned_activities_"]').attr('id').replace('planned_activities_', '');
 
         $.ajax({
-            url: 'ajouter_activite_message.php',
+            url: 'includes/api/activite.php',
             method: 'POST',
-            data: { planned_id: plannedId, message: message },
+            data: { action: 'message', planned_id: plannedId, message: message },
             dataType: 'json',
             success: function(res) {
                 alert(res.message);
@@ -357,8 +357,9 @@ $(document).ready(function(){
 
     // Charger le catalogue des prestations disponibles via AJAX
     $.ajax({
-        url: 'recuperer_prestations.php',
+        url: 'includes/api/prestation.php',
         method: 'GET',
+        data: { action: 'liste' },
         dataType: 'json',
         success: function(data) {
             var html = '';
@@ -376,15 +377,15 @@ $(document).ready(function(){
     });
 
     // Ajouter une prestation via AJAX et mettre à jour la carte sans rechargement
-    $(document).on('click', '.ajouter-prestation', function() {
+    $(document).on('click', '.add-prestation', function() {
         var btn          = $(this);
         var prestationId = btn.data('id');
         btn.prop('disabled', true);
 
         $.ajax({
-            url: 'ajouter_prestation.php',
+            url: 'includes/api/prestation.php',
             method: 'POST',
-            data: { id: prestationId },
+            data: { action: 'ajouter', id: prestationId },
             dataType: 'json',
             success: function(res) {
                 alert(res.message);
