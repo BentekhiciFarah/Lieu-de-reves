@@ -15,9 +15,11 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "client") {
 // Récupérer l'email de l'utilisateur connecté
 $email = $_SESSION['email'] ?? '';
 
-$reservations = readJson("reservation.json") ?: [];
+$reservations      = readJson("reservation.json") ?: [];
 $prestations_client = readJson("prestations_client.json") ?: [];
-$roomTypes = readJson("room_types.json") ?: [];
+$roomTypes         = readJson("room_types.json") ?: [];
+$activities        = readJson("activities.json") ?: [];
+$plannedActivities = readJson("planned_activities.json") ?: [];
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +54,7 @@ $roomTypes = readJson("room_types.json") ?: [];
 
         $facture = null;
         if (($res['statut'] ?? '') === 'validée') {
-            $facture = calculerFactureReservation($res, $roomTypes, $prestations_client);
+            $facture = calculerFactureReservation($res, $roomTypes, $prestations_client, $plannedActivities);
         }
 ?>
 
@@ -93,9 +95,61 @@ $roomTypes = readJson("room_types.json") ?: [];
             </div>
         </div>
 
-            <?php if ($facture): ?>
+            <?php if (($res['statut'] ?? '') === 'validée'): ?>
+
+        <!-- Formulaire de demande d'activité -->
+        <div class="card mb-3 border-info">
+            <div class="card-header bg-info text-white">Demander une activité</div>
+            <div class="card-body">
+                <form class="activity-request-form"
+                      data-reservation-id="<?= htmlspecialchars($res['id']) ?>"
+                      data-max-personnes="<?= (int)($res['nb_personnes'] ?? 1) ?>">
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <label class="form-label">Activité</label>
+                            <select name="activity_id" class="form-select" required>
+                                <option value="">-- Choisir --</option>
+                                <?php foreach ($activities as $act): ?>
+                                    <option value="<?= $act['id'] ?>">
+                                        <?= htmlspecialchars($act['nom']) ?>
+                                        (<?= $act['min_participants'] ?>–<?= $act['max_participants'] ?> pers.)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Créneau</label>
+                            <select name="creneau" class="form-select" required>
+                                <option value="heure">À l'heure</option>
+                                <option value="demi-journee">Demi-journée</option>
+                                <option value="journee">Journée</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Nb personnes</label>
+                            <input type="number" name="nb_personnes" class="form-control"
+                                   min="1" max="<?= (int)($res['nb_personnes'] ?? 1) ?>"
+                                   value="1" required>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <label class="form-label">Précisions (optionnel)</label>
+                        <textarea name="message" class="form-control" rows="2"
+                                  placeholder="Ex : pas le premier jour, préférence matin..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-info btn-sm mt-2 text-white">Envoyer la demande</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Activités planifiées pour cette réservation (chargées via AJAX) -->
+        <div id="planned_activities_<?= htmlspecialchars($res['id']) ?>"></div>
+
+    <?php endif; ?>
+
+    <?php if ($facture): ?>
         <hr>
-        <!-- Facture : mise à jour via AJAX après ajout de prestation -->
+        <!-- Facture : mise à jour via AJAX après ajout de prestation ou activité -->
         <div id="facture_<?= htmlspecialchars($res['id']) ?>">
         <h5>Facture prévisionnelle</h5>
         <table class="table table-bordered table-sm bg-white">
@@ -185,8 +239,122 @@ function updateReservationCard(reservationId) {
     });
 }
 
+// Charge et affiche les activités planifiées d'une réservation
+function loadPlannedActivities(reservationId) {
+    $.ajax({
+        url: 'get_client_activities.php',
+        method: 'GET',
+        data: { reservation_id: reservationId },
+        dataType: 'json',
+        success: function(activities) {
+            var container = $('#planned_activities_' + reservationId);
+            if (activities.length === 0) {
+                container.html('<p class="text-muted"><small>Aucune activité planifiée pour l\'instant.</small></p>');
+                return;
+            }
+            var html = '<div class="card mb-3 border-success">' +
+                '<div class="card-header bg-success text-white">Activités planifiées</div>' +
+                '<div class="card-body"><ul class="list-group list-group-flush">';
+
+            $.each(activities, function(i, pa) {
+                var dateFormate = new Date(pa.date).toLocaleDateString('fr-FR');
+                var creneauLabel = { heure: 'à l\'heure', 'demi-journee': 'demi-journée', journee: 'journée' }[pa.creneau] || pa.creneau;
+                html += '<li class="list-group-item">' +
+                    '<strong>' + $('<div>').text(pa.activity_nom).html() + '</strong> — ' +
+                    dateFormate + ' à ' + (pa.heure || '?') + ' (' + creneauLabel + ')' +
+                    ' — Animateur : ' + $('<div>').text(pa.animateur).html() +
+                    '<br><small class="text-muted">Participants : ';
+
+                var noms = [];
+                $.each(pa.participants, function(j, p) { noms.push($('<div>').text(p.user_nom + ' (' + p.nb_personnes + ' pers.)').html()); });
+                html += noms.join(', ') + '</small>';
+
+                // Messages des participants (visibles par tous)
+                var messagesHtml = '';
+                $.each(pa.participants, function(j, p) {
+                    if (p.message_participant) {
+                        messagesHtml += '<div class="text-muted small mt-1">' +
+                            '<em>' + $('<div>').text(p.user_nom).html() + ' : &laquo; ' +
+                            $('<div>').text(p.message_participant).html() + ' &raquo;</em></div>';
+                    }
+                });
+                if (messagesHtml) html += '<div class="mt-1">' + messagesHtml + '</div>';
+
+                // Formulaire pour ajouter / modifier son propre message
+                html += '<form class="activity-message-form mt-2" data-planned-id="' + pa.id + '">' +
+                    '<div class="input-group input-group-sm">' +
+                    '<input type="text" name="message" class="form-control" placeholder="Ajouter un message pour les participants...">' +
+                    '<button type="submit" class="btn btn-outline-secondary btn-sm">Envoyer</button>' +
+                    '</div></form>';
+
+                html += '</li>';
+            });
+            html += '</ul></div></div>';
+            container.html(html);
+        }
+    });
+}
+
 $(document).ready(function(){
     <?php if ($hasValidReservation): ?>
+
+    // Charger les activités planifiées pour chaque réservation validée au démarrage
+    <?php foreach ($reservations as $res):
+        if (($res['email'] ?? '') === $email && ($res['statut'] ?? '') === 'validée'): ?>
+    loadPlannedActivities('<?= htmlspecialchars($res['id']) ?>');
+    <?php endif; endforeach; ?>
+
+    // Soumettre une demande d'activité via AJAX
+    $(document).on('submit', '.activity-request-form', function(e) {
+        e.preventDefault();
+        var form          = $(this);
+        var reservationId = form.data('reservation-id');
+        var btn           = form.find('button[type="submit"]');
+        btn.prop('disabled', true);
+
+        $.ajax({
+            url: 'add_activity_request.php',
+            method: 'POST',
+            data: form.serialize() + '&reservation_id=' + reservationId,
+            dataType: 'json',
+            success: function(res) {
+                alert(res.message);
+                if (res.success) {
+                    form[0].reset();
+                }
+                btn.prop('disabled', false);
+            },
+            error: function() {
+                alert('Erreur lors de l\'envoi de la demande.');
+                btn.prop('disabled', false);
+            }
+        });
+    });
+
+    // Envoyer un message sur une activité planifiée via AJAX
+    $(document).on('submit', '.activity-message-form', function(e) {
+        e.preventDefault();
+        var form      = $(this);
+        var plannedId = form.data('planned-id');
+        var message   = form.find('input[name="message"]').val().trim();
+        var resId     = form.closest('[id^="planned_activities_"]').attr('id').replace('planned_activities_', '');
+
+        $.ajax({
+            url: 'add_activity_message.php',
+            method: 'POST',
+            data: { planned_id: plannedId, message: message },
+            dataType: 'json',
+            success: function(res) {
+                alert(res.message);
+                if (res.success) {
+                    // Recharger la section activités pour afficher le nouveau message
+                    loadPlannedActivities(resId);
+                }
+            },
+            error: function() { alert('Erreur lors de l\'envoi du message.'); }
+        });
+    });
+
     // Charger le catalogue des prestations disponibles via AJAX
     $.ajax({
         url: 'get_prestations.php',

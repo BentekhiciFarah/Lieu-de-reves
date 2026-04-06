@@ -18,14 +18,15 @@ if (!$reservationId) {
     exit;
 }
 
-$reservations    = readJson("reservation.json") ?: [];
-$roomTypes       = readJson("room_types.json") ?: [];
-$prestationsAll  = readJson("prestations_client.json") ?: [];
+$reservations      = readJson("reservation.json") ?: [];
+$roomTypes         = readJson("room_types.json") ?: [];
+$prestationsAll    = readJson("prestations_client.json") ?: [];
+$plannedActivities = readJson("planned_activities.json") ?: [];
 
 foreach ($reservations as $res) {
     if ($res['id'] == $reservationId && ($res['email'] ?? '') === $email && ($res['statut'] ?? '') === 'validée') {
 
-        $facture = calculerFactureReservation($res, $roomTypes, $prestationsAll);
+        $facture = calculerFactureReservation($res, $roomTypes, $prestationsAll, $plannedActivities);
 
         // Prestations liées à cette réservation
         $prestations = array_values(array_filter($prestationsAll, function($p) use ($email, $reservationId) {

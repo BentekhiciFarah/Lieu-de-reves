@@ -25,7 +25,7 @@ function getNomChambre($typeChambre, $roomTypes) {
     return $typeChambre;
 }
 
-function calculerFactureReservation($reservation, $roomTypes, $prestationsClient) {
+function calculerFactureReservation($reservation, $roomTypes, $prestationsClient, $plannedActivities = []) {
     $lignes = [];
 
     $nbNuits = calculerNombreNuits($reservation['date_debut'], $reservation['date_fin']);
@@ -55,6 +55,23 @@ function calculerFactureReservation($reservation, $roomTypes, $prestationsClient
             ];
 
             $totalPrestations += $montant;
+        }
+    }
+
+    // Activités planifiées pour cette réservation
+    foreach ($plannedActivities as $pa) {
+        foreach (($pa['participants'] ?? []) as $participant) {
+            if ($participant['reservation_id'] == ($reservation['id'] ?? null)) {
+                $nbPers  = (int)($participant['nb_personnes'] ?? 1);
+                $prix    = (float)($pa['prix_par_pers'] ?? 0);
+                $montant = $prix * $nbPers;
+                $date    = (new DateTime($pa['date']))->format('d/m/Y');
+                $lignes[] = [
+                    'label'   => "Activité - {$pa['activity_nom']} le {$date} ({$nbPers} pers.)",
+                    'montant' => $montant
+                ];
+                break;
+            }
         }
     }
 

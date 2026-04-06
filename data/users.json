@@ -85,5 +85,21 @@
         "email": "az@gmail.com",
         "password": "$2y$10$Xs1W1Te7oQrjlmo13pLIZuAmS1gOz9Q0BvbmXHyj6TEFolWP\/QnkK",
         "role": "client"
+    },
+    {
+        "id": "17754822283898",
+        "nom": "amine",
+        "prenom": "",
+        "email": "am@gmail.com",
+        "password": "$2y$10$aWtgdM96bItHWHlpTMCc8eeMkvSyhlRBwpFb1Xx9myTpnSM1kfZuq",
+        "role": "client"
+    },
+    {
+        "id": "17754857209252",
+        "nom": "amine",
+        "prenom": "",
+        "email": "ax@gmail.com",
+        "password": "$2y$10$x8FbR5b3MdN6UBQvLe1GKOwX0XeE4RWu2qf1mHju727nD9jBD3uJe",
+        "role": "client"
     }
 ]

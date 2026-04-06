@@ -180,5 +180,19 @@
         "statut": "en_attente",
         "adresse": "",
         "heure": ""
+    },
+    {
+        "user_email": "ax@gmail.com",
+        "reservation_id": "17754857142246",
+        "prestation": {
+            "id": 1,
+            "name": "Navette a\u00e9roport",
+            "description": "Service de navette pour les transferts depuis et vers l'a\u00e9roport.",
+            "price": 40,
+            "type_tarification": "fixe"
+        },
+        "statut": "en_attente",
+        "adresse": "",
+        "heure": ""
     }
 ]

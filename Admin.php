@@ -253,6 +253,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['section']) && $_GET['se
 // Lecture des prestations clients
 $prestations_client = readJson("prestations_client.json") ?: [];
 
+// Lecture des animateurs pour la planification des activités
+$animateurs = readJson("animateurs.json") ?: [];
+
 // Calcul chambres réservées
 $chambresReservees = [
     "bungalow" => 0,
@@ -658,5 +661,150 @@ $(document).ready(function(){
 
     <hr class="my-4">
 
+    <!-- Gestion des demandes d'activités par journée -->
+    <h3>Demandes d'activités par journée</h3>
+    <div class="card p-3 mb-3 bg-white">
+        <div class="d-flex gap-2 align-items-end flex-wrap">
+            <div>
+                <label for="activityDatePicker" class="form-label mb-1">Sélectionner une date</label>
+                <input type="date" id="activityDatePicker" class="form-control">
+            </div>
+            <button class="btn btn-primary" id="loadActivityRequestsBtn">Voir les demandes</button>
+        </div>
+    </div>
+    <div id="activityRequestsContainer"></div>
+
 </body>
+<script>
+// Données animateurs et activités injectées depuis PHP
+var animateurs = <?= json_encode($animateurs) ?>;
+
+// Construit le HTML de la section demandes d'activités groupées par activité
+function renderActivityRequests(requests, date) {
+    var container = $('#activityRequestsContainer');
+    container.empty();
+
+    if (requests.length === 0) {
+        container.html('<div class="alert alert-secondary">Aucune demande d\'activité en attente pour cette date.</div>');
+        return;
+    }
+
+    // Regrouper les demandes par activité
+    var groups = {};
+    $.each(requests, function(i, req) {
+        var key = req.activity_id;
+        if (!groups[key]) {
+            groups[key] = { activity_id: req.activity_id, activity_nom: req.activity_nom, requests: [] };
+        }
+        groups[key].requests.push(req);
+    });
+
+    // Construire le select des animateurs (réutilisé dans chaque groupe)
+    var animateursOptions = '<option value="">-- Choisir un animateur --</option>';
+    $.each(animateurs, function(i, a) {
+        animateursOptions += '<option value="' + escHtml(a.nom) + '">' + escHtml(a.nom) + '</option>';
+    });
+
+    $.each(groups, function(activityId, group) {
+        var html = '<div class="card mb-4"><div class="card-header"><strong>' +
+            escHtml(group.activity_nom) + '</strong></div><div class="card-body">' +
+            '<form class="plan-activity-form" data-activity-id="' + activityId + '" data-date="' + escHtml(date) + '">' +
+
+            // Checkboxes des demandes
+            '<p class="mb-2"><strong>Demandes à inclure :</strong></p>';
+
+        $.each(group.requests, function(i, req) {
+            var creneauLabel = { heure: 'À l\'heure', 'demi-journee': 'Demi-journée', journee: 'Journée' }[req.creneau] || req.creneau;
+            html += '<div class="form-check mb-1">' +
+                '<input class="form-check-input" type="checkbox" name="request_ids[]" value="' + req.id + '" id="req_' + req.id + '">' +
+                '<label class="form-check-label" for="req_' + req.id + '">' +
+                '<strong>' + escHtml(req.user_nom) + '</strong> (' + escHtml(req.user_email) + ')' +
+                ' — ' + creneauLabel +
+                ' — ' + req.nb_personnes + ' pers.' +
+                ' — séjour : ' + escHtml(req.reservation_date_debut) + ' → ' + escHtml(req.reservation_date_fin) +
+                (req.message ? '<br><em class="text-muted ms-3">&laquo; ' + escHtml(req.message) + ' &raquo;</em>' : '') +
+                '</label></div>';
+        });
+
+        // Champs de planification
+        html += '<div class="row mt-3 g-2">' +
+            '<div class="col-md-4">' +
+                '<label class="form-label">Animateur</label>' +
+                '<select name="animateur" class="form-select" required>' + animateursOptions + '</select>' +
+            '</div>' +
+            '<div class="col-md-3">' +
+                '<label class="form-label">Heure de début</label>' +
+                '<input type="time" name="heure" class="form-control" required>' +
+            '</div>' +
+            '<div class="col-md-3">' +
+                '<label class="form-label">Créneau</label>' +
+                '<select name="creneau" class="form-select">' +
+                    '<option value="heure">À l\'heure</option>' +
+                    '<option value="demi-journee">Demi-journée</option>' +
+                    '<option value="journee">Journée</option>' +
+                '</select>' +
+            '</div>' +
+        '</div>' +
+        '<button type="submit" class="btn btn-success mt-3">Planifier cette activité</button>' +
+        '</form></div></div>';
+
+        container.append(html);
+    });
+}
+
+$(document).ready(function(){
+
+    // Charger les demandes d'activités pour la date sélectionnée
+    $('#loadActivityRequestsBtn').on('click', function() {
+        var date = $('#activityDatePicker').val();
+        if (!date) {
+            alert('Veuillez sélectionner une date.');
+            return;
+        }
+        $.ajax({
+            url: 'get_activity_requests_by_date.php',
+            method: 'GET',
+            data: { date: date },
+            dataType: 'json',
+            success: function(requests) {
+                renderActivityRequests(requests, date);
+            },
+            error: function() { showMessage('Erreur de chargement des demandes.', 'danger'); }
+        });
+    });
+
+    // Planifier une activité
+    $(document).on('submit', '.plan-activity-form', function(e) {
+        e.preventDefault();
+        var form       = $(this);
+        var activityId = form.data('activity-id');
+        var date       = form.data('date');
+
+        // Vérifier qu'au moins une demande est cochée
+        var checked = form.find('input[name="request_ids[]"]:checked');
+        if (checked.length === 0) {
+            alert('Veuillez sélectionner au moins une demande.');
+            return;
+        }
+
+        var data = form.serialize() + '&activity_id=' + activityId + '&date=' + encodeURIComponent(date);
+
+        $.ajax({
+            url: 'plan_activity.php',
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            data: data,
+            success: function(res) {
+                showMessage(res.message, res.success ? 'success' : 'danger');
+                if (res.success) {
+                    // Recharger les demandes pour la même date
+                    $('#loadActivityRequestsBtn').trigger('click');
+                }
+            },
+            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
+        });
+    });
+});
+</script>
 </html>
