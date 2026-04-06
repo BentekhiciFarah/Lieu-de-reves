@@ -56,42 +56,47 @@ $roomTypes = readJson("room_types.json") ?: [];
         }
 ?>
 
-        <div class="card mb-3">
+        <div class="card mb-3" id="card_resa_<?= htmlspecialchars($res['id']) ?>">
             <div class="card-body">
                 <p><strong>Dates :</strong> <?= $res['date_debut'] ?> → <?= $res['date_fin'] ?></p>
                 <p><strong>Chambre :</strong> <?= $res['type_chambre'] ?></p>
                 <p><strong>Personnes :</strong> <?= $res['nb_personnes'] ?></p>
 
                 <p><strong>Statut :</strong>
-                    <span id="statut_resa_<?= htmlspecialchars($res['id']) ?>" 
-                        class="badge 
-                        <?php 
-                            echo ($res['statut'] === 'validée') ? 'bg-success' : 
-                                (($res['statut'] === 'refusée') ? 'bg-danger' : 'bg-warning text-dark'); 
+                    <span id="statut_resa_<?= htmlspecialchars($res['id']) ?>"
+                        class="badge
+                        <?php
+                            echo ($res['statut'] === 'validée') ? 'bg-success' :
+                                (($res['statut'] === 'refusée') ? 'bg-danger' : 'bg-warning text-dark');
                         ?>">
                         <?= htmlspecialchars(ucfirst($res['statut'])) ?>
                     </span>
                 </p>
 
+                <!-- Liste des prestations : mise à jour via AJAX après ajout -->
+                <div id="prestations_list_<?= htmlspecialchars($res['id']) ?>">
                 <?php if(!empty($resPrestations)): ?>
                     <p><strong>Prestations choisies :</strong></p>
                     <ul>
                         <?php foreach($resPrestations as $p): ?>
                             <li>
-                                <?= htmlspecialchars($p['prestation']['name']) ?> - <em><?= $p['statut'] ?></em>
+                                <?= htmlspecialchars($p['prestation']['name']) ?> - <em><?= htmlspecialchars($p['statut']) ?></em>
                                 <?php if($p['statut'] === 'validée'): ?>
-                                    (Adresse: <?= $p['adresse'] ?? 'à définir' ?>,
-                                    Heure: <?= $p['heure'] ?? 'à définir' ?>)
+                                    (Adresse: <?= htmlspecialchars($p['adresse'] ?? 'à définir') ?>,
+                                    Heure: <?= htmlspecialchars($p['heure'] ?? 'à définir') ?>)
                                 <?php endif; ?>
                             </li>
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>
+                </div>
             </div>
         </div>
 
             <?php if ($facture): ?>
         <hr>
+        <!-- Facture : mise à jour via AJAX après ajout de prestation -->
+        <div id="facture_<?= htmlspecialchars($res['id']) ?>">
         <h5>Facture prévisionnelle</h5>
         <table class="table table-bordered table-sm bg-white">
             <thead class="table-light">
@@ -113,6 +118,7 @@ $roomTypes = readJson("room_types.json") ?: [];
                 </tr>
             </tbody>
         </table>
+        </div>
     <?php endif; ?>
 
     <?php
@@ -135,77 +141,121 @@ $roomTypes = readJson("room_types.json") ?: [];
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+// Met à jour la liste des prestations et la facture d'une réservation sans rechargement
+function updateReservationCard(reservationId) {
+    $.ajax({
+        url: 'get_invoice.php',
+        method: 'GET',
+        data: { reservation_id: reservationId },
+        dataType: 'json',
+        success: function(res) {
+            if (!res.success) return;
+
+            // Mettre à jour la liste des prestations
+            var prestList = $('#prestations_list_' + reservationId);
+            if (res.prestations && res.prestations.length > 0) {
+                var html = '<p><strong>Prestations choisies :</strong></p><ul>';
+                $.each(res.prestations, function(i, p) {
+                    html += '<li>' + $('<div>').text(p.prestation.name).html() +
+                            ' - <em>' + $('<div>').text(p.statut).html() + '</em>';
+                    if (p.statut === 'validée') {
+                        html += ' (Adresse: ' + $('<div>').text(p.adresse || 'à définir').html() +
+                                ', Heure: ' + $('<div>').text(p.heure || 'à définir').html() + ')';
+                    }
+                    html += '</li>';
+                });
+                html += '</ul>';
+                prestList.html(html);
+            }
+
+            // Mettre à jour la facture
+            var factureDiv = $('#facture_' + reservationId);
+            if (factureDiv.length && res.facture) {
+                var rows = '';
+                $.each(res.facture.lignes, function(i, ligne) {
+                    var montant = parseFloat(ligne.montant).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+                    rows += '<tr><td>' + $('<div>').text(ligne.label).html() +
+                            '</td><td>' + montant + ' €</td></tr>';
+                });
+                var total = parseFloat(res.facture.total).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+                rows += '<tr class="table-secondary"><th>Total prévisionnel</th><th>' + total + ' €</th></tr>';
+                factureDiv.find('tbody').html(rows);
+            }
+        }
+    });
+}
+
 $(document).ready(function(){
     <?php if ($hasValidReservation): ?>
-    // Charger prestations via AJAX
+    // Charger le catalogue des prestations disponibles via AJAX
     $.ajax({
-        url: 'get_prestations.php', // Fichier qui retourne le JSON des prestations
+        url: 'get_prestations.php',
         method: 'GET',
         dataType: 'json',
-        success: function(data){
-            let html = '';
-            data.forEach(p => {
-                html += `
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">${p.name}</h5>
-                            <p class="card-text">${p.description}</p>
-                            <p class="mt-auto"><strong>${p.price}€</strong> - <small>${p.type_tarification}</small></p>
-                            <button class="btn btn-primary btn-sm mt-2 add-prestation" data-id="${p.id}">Ajouter</button>
-                        </div>
-                    </div>
-                </div>`;
+        success: function(data) {
+            var html = '';
+            $.each(data, function(i, p) {
+                html += '<div class="col-md-6 col-lg-4 mb-4">' +
+                    '<div class="card h-100"><div class="card-body d-flex flex-column">' +
+                    '<h5 class="card-title">' + $('<div>').text(p.name).html() + '</h5>' +
+                    '<p class="card-text">' + $('<div>').text(p.description).html() + '</p>' +
+                    '<p class="mt-auto"><strong>' + p.price + '€</strong> - <small>' + $('<div>').text(p.type_tarification).html() + '</small></p>' +
+                    '<button class="btn btn-primary btn-sm mt-2 add-prestation" data-id="' + p.id + '">Ajouter</button>' +
+                    '</div></div></div>';
             });
-            $("#prestationsContainer").html(html);
+            $('#prestationsContainer').html(html);
         }
     });
 
-    // Ajouter prestation via AJAX
-    $(document).on("click", ".add-prestation", function(){
-        const prestationId = $(this).data("id");
+    // Ajouter une prestation via AJAX et mettre à jour la carte sans rechargement
+    $(document).on('click', '.add-prestation', function() {
+        var btn          = $(this);
+        var prestationId = btn.data('id');
+        btn.prop('disabled', true);
+
         $.ajax({
-            url: "add_prestation.php",
-            method: "POST",
+            url: 'add_prestation.php',
+            method: 'POST',
             data: { id: prestationId },
-            dataType: "json",
-            success: function(res){
+            dataType: 'json',
+            success: function(res) {
                 alert(res.message);
-                location.reload(); // Recharge la page pour afficher la nouvelle prestation
+                if (res.success && res.reservation_id) {
+                    // Mettre à jour la carte concernée sans recharger la page
+                    updateReservationCard(res.reservation_id);
+                }
+                btn.prop('disabled', false);
             },
-            error: function(){
+            error: function() {
                 alert("Erreur lors de l'ajout de la prestation.");
+                btn.prop('disabled', false);
             }
         });
     });
     <?php endif; ?>
 });
 
-// mettre à jour le statut de la réservation
+// Vérifie les statuts des réservations toutes les 5 secondes
 function refreshReservations() {
     $.ajax({
-        url: 'refresh_reservations.php', // un petit fichier qui renvoie uniquement tes réservations client en JSON
+        url: 'refresh_reservations.php',
         method: 'GET',
         dataType: 'json',
-        success: function(data){
-            data.forEach(res => {
-                const badge = $("#statut_resa_" + res.id);
-                if(badge.length){
-                    // Mettre à jour texte
+        success: function(data) {
+            $.each(data, function(i, res) {
+                var badge = $('#statut_resa_' + res.id);
+                if (badge.length) {
                     badge.text(res.statut.charAt(0).toUpperCase() + res.statut.slice(1));
-
-                    // Mettre à jour couleur
-                    badge.removeClass("bg-success bg-warning bg-danger text-dark");
-                    if(res.statut === 'validée') badge.addClass("bg-success");
-                    else if(res.statut === 'refusée') badge.addClass("bg-danger");
-                    else badge.addClass("bg-warning text-dark");
+                    badge.removeClass('bg-success bg-warning bg-danger text-dark');
+                    if (res.statut === 'validée')       badge.addClass('bg-success');
+                    else if (res.statut === 'refusée')  badge.addClass('bg-danger');
+                    else                                badge.addClass('bg-warning text-dark');
                 }
             });
         }
     });
 }
 
-// Vérifie les statuts toutes les 5 secondes
 setInterval(refreshReservations, 5000);
 </script>
 </body>

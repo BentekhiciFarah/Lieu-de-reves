@@ -159,8 +159,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
         $messageAdmin = "Réservation introuvable.";
     }
 
-    $_SESSION['message_admin'] = $messageAdmin;
+    // Réponse JSON pour les requêtes AJAX (pas de rechargement de page)
+    if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        // Recalculer les chambres réservées pour mettre à jour le tableau
+        $resAfter = readJson("reservation.json") ?: [];
+        $chRes = ['bungalow' => 0, 'villa' => 0, 'suite' => 0];
+        foreach ($resAfter as $r) {
+            $t = strtolower(trim($r['type_chambre'] ?? ''));
+            if ($t === 'bungalow sur pilotis') $t = 'bungalow';
+            elseif ($t === 'villa sur la plage') $t = 'villa';
+            elseif ($t === 'suite avec piscine privée') $t = 'suite';
+            if (($r['statut'] ?? '') === 'validée' && isset($chRes[$t])) $chRes[$t]++;
+        }
+        echo json_encode([
+            'success'           => $reservationTrouvee,
+            'message'           => $messageAdmin,
+            'chambres_reservees' => $chRes
+        ]);
+        exit;
+    }
 
+    $_SESSION['message_admin'] = $messageAdmin;
     header("Location: Admin.php");
     exit;
 }
@@ -220,6 +240,16 @@ $chambresDisponibles = [
 // Lecture des réservations
 $reservations = readJson("reservation.json") ?: [];
 
+// Handler AJAX GET : retourne les réservations validées en JSON
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['section']) && $_GET['section'] === 'validees') {
+    header('Content-Type: application/json');
+    $validees = array_values(array_filter($reservations, function($r) {
+        return ($r['statut'] ?? '') === 'validée';
+    }));
+    echo json_encode($validees);
+    exit;
+}
+
 // Lecture des prestations clients
 $prestations_client = readJson("prestations_client.json") ?: [];
 
@@ -255,47 +285,234 @@ foreach ($reservations as $r) {
 </head>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function(){
-        $(".prestation-form").on("submit", function(e){
-            e.preventDefault();
-            const form = $(this);
-            const prestationId = form.find("input[name='prestation_id']").val();
-            const action = $(document.activeElement).val(); // bouton cliqué
-            const adresse = form.find("input[name='adresse']").val();
-            const heure = form.find("input[name='heure']").val();
+// Données des chambres disponibles pour les calculs côté client
+var chambresDisponibles = <?= json_encode($chambresDisponibles) ?>;
 
-            $.ajax({
-                url: "Admin.php",
-                method: "POST",
-                dataType: "json",
-                headers: { "X-Requested-With": "XMLHttpRequest" },
-                data: { prestation_id: prestationId, action: action, adresse: adresse, heure: heure },
-                success: function(res){
-                    alert(res.message);
-                    if(res.success){
-                        // mettre à jour le statut visible
-                        form.closest(".card-body").find("p strong:contains('Prestation')").next().text(res.nouveau_statut);
-                        form.remove(); // supprimer formulaire après action
-                    }
-                },
-                error: function(){
-                    alert("Erreur AJAX");
+// Échappe le HTML pour éviter les injections XSS
+function escHtml(str) {
+    return $('<div>').text(String(str || '')).html();
+}
+
+// Affiche un message en haut de page sans rechargement
+function showMessage(message, type) {
+    type = type || 'info';
+    $('#messageAdmin').html('<div class="alert alert-' + type + '"><pre class="mb-0">' + escHtml(message) + '</pre></div>');
+    $('html, body').animate({ scrollTop: 0 }, 300);
+}
+
+// Met à jour le tableau des chambres disponibles/réservées
+function updateChambresTable(chambresReservees) {
+    $.each(chambresReservees, function(type, reservees) {
+        var row = $('#chambresTableBody tr[data-type="' + type + '"]');
+        row.find('.chambre-reservee').text(reservees);
+        row.find('.chambre-dispo').text(chambresDisponibles[type] - reservees);
+    });
+}
+
+// Construit le HTML d'une carte réservation validée
+function renderValidatedCard(res) {
+    var arrhes    = parseFloat(res.arrhes || 0).toFixed(2);
+    var reduction = parseInt(res.reduction_prestations || 0);
+    return '<div class="card mb-3" id="validated_card_' + res.id + '">' +
+        '<div class="card-body">' +
+        '<p><strong>Nom :</strong> ' + escHtml(res.nom) + '</p>' +
+        '<p><strong>Email :</strong> ' + escHtml(res.email) + '</p>' +
+        '<p><strong>Dates :</strong> ' + escHtml(res.date_debut) + ' → ' + escHtml(res.date_fin) + '</p>' +
+        '<p><strong>Type chambre :</strong> ' + escHtml(res.type_chambre) + '</p>' +
+        '<p><strong>Personnes :</strong> ' + escHtml(res.nb_personnes) + '</p>' +
+        '<p class="arrhes-display"><strong>Avance enregistrée :</strong> ' + arrhes.replace('.', ',') + ' €</p>' +
+        '<p class="reduction-display"><strong>Réduction sur prestations :</strong> ' + reduction + ' %</p>' +
+        '<div class="row">' +
+            '<div class="col-md-6">' +
+                '<form class="border rounded p-3 bg-light mb-2 arrhes-form">' +
+                    '<input type="hidden" name="reservation_id" value="' + res.id + '">' +
+                    '<label class="form-label"><strong>Enregistrer l\'avance</strong></label>' +
+                    '<input type="number" step="0.01" min="0" name="arrhes" class="form-control mb-2" value="' + arrhes + '">' +
+                    '<button type="submit" class="btn btn-primary btn-sm" value="maj_arrhes">Enregistrer l\'avance</button>' +
+                '</form>' +
+            '</div>' +
+            '<div class="col-md-6">' +
+                '<form class="border rounded p-3 bg-light mb-2 reduction-form">' +
+                    '<input type="hidden" name="reservation_id" value="' + res.id + '">' +
+                    '<label class="form-label"><strong>Réduction sur prestations</strong></label>' +
+                    '<select name="reduction_prestations" class="form-select mb-2">' +
+                        '<option value="0"'  + (reduction === 0  ? ' selected' : '') + '>0%</option>'  +
+                        '<option value="10"' + (reduction === 10 ? ' selected' : '') + '>-10%</option>' +
+                        '<option value="20"' + (reduction === 20 ? ' selected' : '') + '>-20%</option>' +
+                        '<option value="50"' + (reduction === 50 ? ' selected' : '') + '>-50%</option>' +
+                    '</select>' +
+                    '<button type="submit" class="btn btn-warning btn-sm" value="maj_reduction">Enregistrer réduction</button>' +
+                '</form>' +
+            '</div>' +
+        '</div>' +
+        '</div></div>';
+}
+
+// Charge la section des réservations validées via AJAX
+function loadValidatedSection() {
+    $.ajax({
+        url: 'Admin.php',
+        method: 'GET',
+        data: { section: 'validees' },
+        dataType: 'json',
+        success: function(reservations) {
+            var container = $('#validatedContainer');
+            container.empty();
+            if (reservations.length === 0) {
+                container.html('<div class="alert alert-secondary">Aucune réservation validée.</div>');
+            } else {
+                $.each(reservations, function(i, res) {
+                    container.append(renderValidatedCard(res));
+                });
+            }
+        },
+        error: function() {
+            $('#validatedContainer').html('<div class="alert alert-danger">Erreur de chargement.</div>');
+        }
+    });
+}
+
+var lastClickedAction = '';
+
+$(document).ready(function(){
+
+    // Charger la section validées au chargement de la page
+    loadValidatedSection();
+
+    // Mémoriser le bouton cliqué avant soumission du formulaire
+    $(document).on('click', 'button[type="submit"]', function() {
+        lastClickedAction = $(this).val();
+    });
+
+    // --- Formulaires valider / refuser une réservation ---
+    $(document).on('submit', '.reservation-form', function(e) {
+        e.preventDefault();
+        var form          = $(this);
+        var card          = form.closest('.card');
+        var action        = lastClickedAction;
+        var reservationId = form.find('input[name="reservation_id"]').val();
+
+        $.ajax({
+            url: 'Admin.php',
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            data: { reservation_id: reservationId, action: action },
+            success: function(res) {
+                showMessage(res.message, res.success ? 'info' : 'danger');
+                if (res.success) {
+                    card.fadeOut(400, function() {
+                        $(this).remove();
+                        // Si plus aucune carte en attente, afficher le message vide
+                        if ($('#pendingContainer .card').length === 0) {
+                            $('#pendingContainer').html('<div class="alert alert-secondary">Aucune demande en attente.</div>');
+                        }
+                    });
+                    if (res.chambres_reservees) updateChambresTable(res.chambres_reservees);
+                    // Après validation, recharger la section validées
+                    if (action === 'valider') loadValidatedSection();
                 }
-            });
+            },
+            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
         });
     });
+
+    // --- Formulaires arrhes ---
+    $(document).on('submit', '.arrhes-form', function(e) {
+        e.preventDefault();
+        var form          = $(this);
+        var reservationId = form.find('input[name="reservation_id"]').val();
+        var arrhes        = form.find('input[name="arrhes"]').val();
+
+        $.ajax({
+            url: 'Admin.php',
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            data: { reservation_id: reservationId, action: 'maj_arrhes', arrhes: arrhes },
+            success: function(res) {
+                showMessage(res.message, res.success ? 'success' : 'danger');
+                if (res.success) {
+                    // Mettre à jour le texte affiché dans la carte
+                    form.closest('.card').find('.arrhes-display').html(
+                        '<strong>Avance enregistrée :</strong> ' +
+                        parseFloat(arrhes).toFixed(2).replace('.', ',') + ' €'
+                    );
+                }
+            },
+            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
+        });
+    });
+
+    // --- Formulaires réduction ---
+    $(document).on('submit', '.reduction-form', function(e) {
+        e.preventDefault();
+        var form          = $(this);
+        var reservationId = form.find('input[name="reservation_id"]').val();
+        var reduction     = form.find('select[name="reduction_prestations"]').val();
+
+        $.ajax({
+            url: 'Admin.php',
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            data: { reservation_id: reservationId, action: 'maj_reduction', reduction_prestations: reduction },
+            success: function(res) {
+                showMessage(res.message, res.success ? 'success' : 'danger');
+                if (res.success) {
+                    form.closest('.card').find('.reduction-display').html(
+                        '<strong>Réduction sur prestations :</strong> ' + reduction + ' %'
+                    );
+                }
+            },
+            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
+        });
+    });
+
+    // --- Formulaires validation/refus de prestations ---
+    $(document).on('submit', '.prestation-form', function(e) {
+        e.preventDefault();
+        var form        = $(this);
+        var prestationId = form.find('input[name="prestation_id"]').val();
+        var action      = lastClickedAction;
+        var adresse     = form.find('input[name="adresse"]').val();
+        var heure       = form.find('input[name="heure"]').val();
+
+        $.ajax({
+            url: 'Admin.php',
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            data: { prestation_id: prestationId, action: action, adresse: adresse, heure: heure },
+            success: function(res) {
+                showMessage(res.message, res.success ? 'success' : 'danger');
+                if (res.success) {
+                    form.closest('.card').fadeOut(400, function() {
+                        $(this).remove();
+                        if ($('#prestationsContainer .card').length === 0) {
+                            $('#prestationsContainer').html('<div class="alert alert-secondary">Aucune demande de prestation en attente.</div>');
+                        }
+                    });
+                }
+            },
+            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
+        });
+    });
+});
 </script>
 <body class="p-4 bg-light">
 
 <div class="container">
     <h1 class="mb-4">Gestion des réservations</h1>
 
-    <!-- Affichage message admin -->
+    <!-- Zone de message admin (mise à jour via AJAX, sans rechargement) -->
+    <div id="messageAdmin">
     <?php if (!empty($messageAdmin)): ?>
         <div class="alert alert-info">
             <pre class="mb-0"><?= htmlspecialchars($messageAdmin) ?></pre>
         </div>
     <?php endif; ?>
+    </div>
 
     <!-- État des chambres -->
     <h3>État des chambres</h3>
@@ -307,12 +524,12 @@ foreach ($reservations as $r) {
                 <th>Disponibles</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="chambresTableBody">
             <?php foreach ($chambresDisponibles as $type => $total): ?>
-                <tr>
+                <tr data-type="<?= $type ?>">
                     <td><?= ucfirst($type) ?></td>
-                    <td><?= $chambresReservees[$type] ?></td>
-                    <td><?= $total - $chambresReservees[$type] ?></td>
+                    <td class="chambre-reservee"><?= $chambresReservees[$type] ?></td>
+                    <td class="chambre-dispo"><?= $total - $chambresReservees[$type] ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -322,6 +539,7 @@ foreach ($reservations as $r) {
 
     <!-- Affichage des réservations classiques en attente -->
     <h3>Demandes de réservation en attente</h3>
+    <div id="pendingContainer">
     <?php
     $enAttente = false;
     foreach ($reservations as $res):
@@ -357,10 +575,10 @@ foreach ($reservations as $r) {
                     ?>
                 </p>
 
-                <form action="Admin.php" method="POST" class="d-inline">
+                <form class="d-inline reservation-form">
                     <input type="hidden" name="reservation_id" value="<?= htmlspecialchars($res['id']) ?>">
-                    <button type="submit" name="action" value="valider" class="btn btn-success btn-sm">Valider</button>
-                    <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm">Refuser</button>
+                    <button type="submit" class="btn btn-success btn-sm" value="valider">Valider</button>
+                    <button type="submit" class="btn btn-danger btn-sm" value="refuser">Refuser</button>
                 </form>
             </div>
         </div>
@@ -374,11 +592,13 @@ foreach ($reservations as $r) {
             Aucune demande en attente.
         </div>
     <?php endif; ?>
+    </div><!-- #pendingContainer -->
 
     <hr class="my-4">
 
     <!-- Affichage des prestations en attente -->
     <h3>Demandes de prestations / activités en attente</h3>
+    <div id="prestationsContainer">
     <?php
         $prestationsEnAttente = false;
     // Parcours des prestations demandées par les clients
@@ -426,75 +646,15 @@ foreach ($reservations as $r) {
             Aucune demande de prestation en attente.
         </div>
     <?php endif; ?>
+    </div><!-- #prestationsContainer -->
 
+    <hr class="my-4">
 
+    <!-- Réservations validées : chargées via AJAX pour éviter tout rechargement -->
     <h3>Réservations validées</h3>
-    <?php
-    $valides = false;
-    foreach ($reservations as $res):
-        if (($res['statut'] ?? '') === 'validée'):
-            $valides = true;
-
-            $arrhes = (float)($res['arrhes'] ?? 0);
-            $reductionPrestations = (int)($res['reduction_prestations'] ?? 0);
-    ?>
-        <div class="card mb-3">
-            <div class="card-body">
-                <p><strong>Nom :</strong> <?= htmlspecialchars($res['nom'] ?? '') ?></p>
-                <p><strong>Email :</strong> <?= htmlspecialchars($res['email'] ?? '') ?></p>
-                <p><strong>Dates :</strong> <?= htmlspecialchars($res['date_debut'] ?? '') ?> → <?= htmlspecialchars($res['date_fin'] ?? '') ?></p>
-                <p><strong>Type chambre :</strong> <?= htmlspecialchars($res['type_chambre'] ?? '') ?></p>
-                <p><strong>Nombre de personnes :</strong> <?= htmlspecialchars($res['nb_personnes'] ?? '') ?></p>
-                <p><strong>Enregistrer l'avance :</strong> <?= number_format($arrhes, 2, ',', ' ') ?> €</p>
-                <p><strong>Réduction actuelle sur prestations :</strong> <?= $reductionPrestations ?> %</p>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <form action="Admin.php" method="POST" class="border rounded p-3 bg-light mb-2">
-                            <input type="hidden" name="reservation_id" value="<?= htmlspecialchars($res['id']) ?>">
-                            <label class="form-label"><strong>Enregistrer l'avance</strong></label>
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                name="arrhes"
-                                class="form-control mb-2"
-                                value="<?= htmlspecialchars($arrhes) ?>"
-                            >
-                            <button type="submit" name="action" value="maj_arrhes" class="btn btn-primary btn-sm">
-                                Enregistrer l'avance
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="col-md-6">
-                        <form action="Admin.php" method="POST" class="border rounded p-3 bg-light mb-2">
-                            <input type="hidden" name="reservation_id" value="<?= htmlspecialchars($res['id']) ?>">
-                            <label class="form-label"><strong>Réduction sur prestations</strong></label>
-                            <select name="reduction_prestations" class="form-select mb-2">
-                                <option value="0" <?= ($reductionPrestations === 0) ? 'selected' : '' ?>>0%</option>
-                                <option value="10" <?= ($reductionPrestations === 10) ? 'selected' : '' ?>>10%</option>
-                                <option value="20" <?= ($reductionPrestations === 20) ? 'selected' : '' ?>>20%</option>
-                                <option value="50" <?= ($reductionPrestations === 50) ? 'selected' : '' ?>>50%</option>
-                            </select>
-                            <button type="submit" name="action" value="maj_reduction" class="btn btn-warning btn-sm">
-                                Enregistrer réduction
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php
-        endif;
-    endforeach;
-    ?>
-
-    <?php if (!$valides): ?>
-        <div class="alert alert-secondary">
-            Aucune réservation validée.
-        </div>
-    <?php endif; ?>
+    <div id="validatedContainer">
+        <div class="text-center text-muted py-3"><em>Chargement...</em></div>
+    </div>
 
     <hr class="my-4">
 

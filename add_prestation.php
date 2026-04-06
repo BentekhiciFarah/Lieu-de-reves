@@ -77,5 +77,9 @@ $prestations_client[] = $newPrestation;
 // Enregistrer le fichier JSON mis à jour
 writeJson("prestations_client.json", $prestations_client);
 
-// Retourner le résultat
-echo json_encode(['success' => true, 'message' => 'Prestation ajoutée avec succès, en attente de validation']);
+// Retourner le résultat avec l'ID de réservation pour permettre la mise à jour du DOM
+echo json_encode([
+    'success'        => true,
+    'message'        => 'Prestation ajoutée avec succès, en attente de validation',
+    'reservation_id' => $validReservation['id']
+]);
