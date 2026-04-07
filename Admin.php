@@ -14,15 +14,6 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "admin") {
 $messageAdmin = $_SESSION['message_admin'] ?? "";
 unset($_SESSION['message_admin']);
 
-$activitiesData = readJson("activities.json") ?: [];
- // Création d'une map id → nom pour les activités
-$activitiesMap = [];
-
-// Normalisation des activités pour éviter les erreurs d'affichage
-foreach ($activitiesData as $act) {
-    $activitiesMap[$act['id']] = $act['nom'];
-}
-
 
 // Traitement du formulaire de validation/refus de réservation
 
@@ -470,27 +461,6 @@ $(document).ready(function(){
                 <p><strong>Dates :</strong> <?= htmlspecialchars($res['date_debut'] ?? '') ?> → <?= htmlspecialchars($res['date_fin'] ?? '') ?></p>
                 <p><strong>Type chambre :</strong> <?= htmlspecialchars($res['type_chambre'] ?? '') ?></p>
                 <p><strong>Nombre de personnes :</strong> <?= htmlspecialchars($res['nb_personnes'] ?? '') ?></p>
-                <p><strong>Activités :</strong>
-                    <?php
-                        if (!empty($res['activites']) && is_array($res['activites'])) {
-
-                            $nomsActivites = [];
-
-                            foreach ($res['activites'] as $id) {
-                                if (isset($activitiesMap[$id])) {
-                                    $nomsActivites[] = $activitiesMap[$id];
-                                } else {
-                                    $nomsActivites[] = "Activité inconnue";
-                                }
-                            }
-
-                            echo htmlspecialchars(implode(", ", $nomsActivites));
-
-                        } else {
-                            echo "Aucune";
-                        }
-                    ?>
-                </p>
 
                 <form class="d-inline reservation-form">
                     <input type="hidden" name="reservation_id" value="<?= htmlspecialchars($res['id']) ?>">

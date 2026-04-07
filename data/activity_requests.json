@@ -65,6 +65,7 @@
         "date_creation": "2026-04-07 00:43:05"
     },
     {
+<<<<<<< HEAD
         "id": "17755505278385",
         "reservation_id": "17755504376295",
         "user_email": "hdiuhc@gmail.com",
@@ -76,5 +77,44 @@
         "message": "",
         "statut": "en_attente",
         "date_creation": "2026-04-07 10:28:47"
+=======
+        "id": "17755494849831",
+        "reservation_id": "17755493983347",
+        "user_email": "XX@gmail.com",
+        "user_nom": "XX",
+        "activity_id": 2,
+        "activity_nom": "Sortie en bateau",
+        "creneau": "demi-journee",
+        "nb_personnes": 3,
+        "message": "",
+        "statut": "planifiee",
+        "date_creation": "2026-04-07 10:11:24"
+    },
+    {
+        "id": "17755516306960",
+        "reservation_id": "17755515816567",
+        "user_email": "YY@gmail.com",
+        "user_nom": "YY",
+        "activity_id": 2,
+        "activity_nom": "Sortie en bateau",
+        "creneau": "demi-journee",
+        "nb_personnes": 5,
+        "message": "",
+        "statut": "planifiee",
+        "date_creation": "2026-04-07 10:47:10"
+    },
+    {
+        "id": "17755521777946",
+        "reservation_id": "17755521128121",
+        "user_email": "Ya@gmail.com",
+        "user_nom": "YA",
+        "activity_id": 3,
+        "activity_nom": "Paddle \/ Kayak",
+        "creneau": "demi-journee",
+        "nb_personnes": 3,
+        "message": "",
+        "statut": "planifiee",
+        "date_creation": "2026-04-07 10:56:17"
+>>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
     }
 ]

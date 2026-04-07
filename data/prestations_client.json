@@ -224,8 +224,13 @@
         "heure": ""
     },
     {
+<<<<<<< HEAD
         "user_email": "juju@juju.com",
         "reservation_id": "17755859458508",
+=======
+        "user_email": "XX@gmail.com",
+        "reservation_id": "17755493983347",
+>>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
         "prestation": {
             "id": 1,
             "name": "Navette a\u00e9roport",
@@ -238,8 +243,13 @@
         "heure": ""
     },
     {
+<<<<<<< HEAD
         "user_email": "juju@juju.com",
         "reservation_id": "17755859458508",
+=======
+        "user_email": "YY@gmail.com",
+        "reservation_id": "17755515816567",
+>>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
         "prestation": {
             "id": 2,
             "name": "Petit d\u00e9jeuner en chambre",
@@ -252,8 +262,13 @@
         "heure": ""
     },
     {
+<<<<<<< HEAD
         "user_email": "juju@juju.com",
         "reservation_id": "17755859458508",
+=======
+        "user_email": "YY@gmail.com",
+        "reservation_id": "17755515816567",
+>>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
         "prestation": {
             "id": 3,
             "name": "Diner tropical",
@@ -266,6 +281,7 @@
         "heure": ""
     },
     {
+<<<<<<< HEAD
         "user_email": "juju@juju.com",
         "reservation_id": "17755859458508",
         "prestation": {
@@ -273,6 +289,15 @@
             "name": "Excursion en bateau",
             "description": "Une excursion en bateau pour d\u00e9couvrir les merveilles de la c\u00f4te.",
             "price": 150,
+=======
+        "user_email": "Ya@gmail.com",
+        "reservation_id": "17755521128121",
+        "prestation": {
+            "id": 2,
+            "name": "Petit d\u00e9jeuner en chambre",
+            "description": "Service de petit d\u00e9jeuner livr\u00e9 directement dans la chambre.",
+            "price": 20,
+>>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
             "type_tarification": "par_personne"
         },
         "statut": "valid\u00e9e",

@@ -89,6 +89,7 @@
         "date_creation": "2026-04-07 00:40:56"
     },
     {
+<<<<<<< HEAD
         "id": "17755500713664",
         "nom": "Ho",
         "email": "uihcu@gmail.com",
@@ -141,10 +142,51 @@
         "date_debut": "2026-04-23",
         "date_fin": "2026-05-10",
         "nb_personnes": 2,
+=======
+        "id": "17755493983347",
+        "nom": "XX",
+        "email": "XX@gmail.com",
+        "date_debut": "2026-04-10",
+        "date_fin": "2026-04-14",
+        "nb_personnes": 4,
+>>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
         "type_chambre": "bungalow",
         "activites": [],
         "message": "",
         "statut": "valid\u00e9e",
+<<<<<<< HEAD
         "date_creation": "2026-04-07 20:19:05"
+=======
+        "date_creation": "2026-04-07 10:09:58"
+    },
+    {
+        "id": "17755515816567",
+        "nom": "YY",
+        "email": "YY@gmail.com",
+        "date_debut": "2026-04-09",
+        "date_fin": "2026-04-23",
+        "nb_personnes": 5,
+        "type_chambre": "bungalow",
+        "activites": [
+            "1"
+        ],
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-07 10:46:21"
+    },
+    {
+        "id": "17755521128121",
+        "nom": "YA",
+        "email": "Ya@gmail.com",
+        "date_debut": "2026-04-10",
+        "date_fin": "2026-04-15",
+        "nb_personnes": 5,
+        "type_chambre": "bungalow",
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-07 10:55:12",
+        "reduction_prestations": 10,
+        "arrhes": 100
+>>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
     }
 ]
