@@ -311,21 +311,19 @@ function loadValidatedSection() {
         url: 'Admin.php',
         method: 'GET',
         data: { section: 'validees' },
-        dataType: 'json',
-        success: function(reservations) {
-            var container = $('#validatedContainer');
-            container.empty();
-            if (reservations.length === 0) {
-                container.html('<div class="alert alert-secondary">Aucune réservation validée.</div>');
-            } else {
-                $.each(reservations, function(i, res) {
-                    container.append(renderValidatedCard(res));
-                });
-            }
-        },
-        error: function() {
-            $('#validatedContainer').html('<div class="alert alert-danger">Erreur de chargement.</div>');
+        dataType: 'json'
+    }).done(function(reservations) {
+        var container = $('#validatedContainer');
+        container.empty();
+        if (reservations.length === 0) {
+            container.html('<div class="alert alert-secondary">Aucune réservation validée.</div>');
+        } else {
+            $.each(reservations, function(i, res) {
+                container.append(renderValidatedCard(res));
+            });
         }
+    }).fail(function() {
+        $('#validatedContainer').html('<div class="alert alert-danger">Erreur de chargement.</div>');
     });
 }
 
@@ -354,24 +352,20 @@ $(document).ready(function(){
             method: 'POST',
             dataType: 'json',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            data: { reservation_id: reservationId, action: action },
-            success: function(res) {
-                showMessage(res.message, res.success ? 'info' : 'danger');
-                if (res.success) {
-                    card.fadeOut(400, function() {
-                        $(this).remove();
-                        // Si plus aucune carte en attente, afficher le message vide
-                        if ($('#pendingContainer .card').length === 0) {
-                            $('#pendingContainer').html('<div class="alert alert-secondary">Aucune demande en attente.</div>');
-                        }
-                    });
-                    if (res.chambres_reservees) updateChambresTable(res.chambres_reservees);
-                    // Après validation, recharger la section validées
-                    if (action === 'valider') loadValidatedSection();
-                }
-            },
-            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
-        });
+            data: { reservation_id: reservationId, action: action }
+        }).done(function(res) {
+            showMessage(res.message, res.success ? 'info' : 'danger');
+            if (res.success) {
+                card.fadeOut(400, function() {
+                    $(this).remove();
+                    if ($('#pendingContainer .card').length === 0) {
+                        $('#pendingContainer').html('<div class="alert alert-secondary">Aucune demande en attente.</div>');
+                    }
+                });
+                if (res.chambres_reservees) updateChambresTable(res.chambres_reservees);
+                if (action === 'valider') loadValidatedSection();
+            }
+        }).fail(function() { showMessage('Erreur de communication avec le serveur.', 'danger'); });
     });
 
     // --- Formulaires arrhes ---
@@ -386,19 +380,16 @@ $(document).ready(function(){
             method: 'POST',
             dataType: 'json',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            data: { reservation_id: reservationId, action: 'maj_arrhes', arrhes: arrhes },
-            success: function(res) {
-                showMessage(res.message, res.success ? 'success' : 'danger');
-                if (res.success) {
-                    // Mettre à jour le texte affiché dans la carte
-                    form.closest('.card').find('.arrhes-display').html(
-                        '<strong>Avance enregistrée :</strong> ' +
-                        parseFloat(arrhes).toFixed(2).replace('.', ',') + ' €'
-                    );
-                }
-            },
-            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
-        });
+            data: { reservation_id: reservationId, action: 'maj_arrhes', arrhes: arrhes }
+        }).done(function(res) {
+            showMessage(res.message, res.success ? 'success' : 'danger');
+            if (res.success) {
+                form.closest('.card').find('.arrhes-display').html(
+                    '<strong>Avance enregistrée :</strong> ' +
+                    parseFloat(arrhes).toFixed(2).replace('.', ',') + ' €'
+                );
+            }
+        }).fail(function() { showMessage('Erreur de communication avec le serveur.', 'danger'); });
     });
 
     // --- Formulaires réduction ---
@@ -413,17 +404,15 @@ $(document).ready(function(){
             method: 'POST',
             dataType: 'json',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            data: { reservation_id: reservationId, action: 'maj_reduction', reduction_prestations: reduction },
-            success: function(res) {
-                showMessage(res.message, res.success ? 'success' : 'danger');
-                if (res.success) {
-                    form.closest('.card').find('.reduction-display').html(
-                        '<strong>Réduction sur prestations :</strong> ' + reduction + ' %'
-                    );
-                }
-            },
-            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
-        });
+            data: { reservation_id: reservationId, action: 'maj_reduction', reduction_prestations: reduction }
+        }).done(function(res) {
+            showMessage(res.message, res.success ? 'success' : 'danger');
+            if (res.success) {
+                form.closest('.card').find('.reduction-display').html(
+                    '<strong>Réduction sur prestations :</strong> ' + reduction + ' %'
+                );
+            }
+        }).fail(function() { showMessage('Erreur de communication avec le serveur.', 'danger'); });
     });
 
 });
@@ -637,12 +626,10 @@ $(document).ready(function(){
             url: 'includes/api/activite.php',
             method: 'GET',
             data: { action: 'par_date', date: date },
-            dataType: 'json',
-            success: function(requests) {
-                renderActivityRequests(requests, date);
-            },
-            error: function() { showMessage('Erreur de chargement des demandes.', 'danger'); }
-        });
+            dataType: 'json'
+        }).done(function(requests) {
+            renderActivityRequests(requests, date);
+        }).fail(function() { showMessage('Erreur de chargement des demandes.', 'danger'); });
     });
 
     // Planifier une activité
@@ -666,16 +653,13 @@ $(document).ready(function(){
             method: 'POST',
             dataType: 'json',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            data: data,
-            success: function(res) {
-                showMessage(res.message, res.success ? 'success' : 'danger');
-                if (res.success) {
-                    // Recharger les demandes pour la même date
-                    $('#loadActivityRequestsBtn').trigger('click');
-                }
-            },
-            error: function() { showMessage('Erreur de communication avec le serveur.', 'danger'); }
-        });
+            data: data
+        }).done(function(res) {
+            showMessage(res.message, res.success ? 'success' : 'danger');
+            if (res.success) {
+                $('#loadActivityRequestsBtn').trigger('click');
+            }
+        }).fail(function() { showMessage('Erreur de communication avec le serveur.', 'danger'); });
     });
 });
 </script>

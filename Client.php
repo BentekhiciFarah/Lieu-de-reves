@@ -201,40 +201,39 @@ function updateReservationCard(reservationId) {
         url: 'includes/api/facture.php',
         method: 'GET',
         data: { action: 'detail', reservation_id: reservationId },
-        dataType: 'json',
-        success: function(res) {
-            if (!res.success) return;
+        dataType: 'json'
+    }).done(function(res) {
+        if (!res.success) return;
 
-            // Mettre à jour la liste des prestations
-            var prestList = $('#prestations_list_' + reservationId);
-            if (res.prestations && res.prestations.length > 0) {
-                var html = '<p><strong>Prestations choisies :</strong></p><ul>';
-                $.each(res.prestations, function(i, p) {
-                    html += '<li>' + $('<div>').text(p.prestation.name).html() +
-                            ' - <em>' + $('<div>').text(p.statut).html() + '</em>';
-                    if (p.statut === 'validée') {
-                        html += ' (Adresse: ' + $('<div>').text(p.adresse || 'à définir').html() +
-                                ', Heure: ' + $('<div>').text(p.heure || 'à définir').html() + ')';
-                    }
-                    html += '</li>';
-                });
-                html += '</ul>';
-                prestList.html(html);
-            }
+        // Mettre à jour la liste des prestations
+        var prestList = $('#prestations_list_' + reservationId);
+        if (res.prestations && res.prestations.length > 0) {
+            var html = '<p><strong>Prestations choisies :</strong></p><ul>';
+            $.each(res.prestations, function(i, p) {
+                html += '<li>' + $('<div>').text(p.prestation.name).html() +
+                        ' - <em>' + $('<div>').text(p.statut).html() + '</em>';
+                if (p.statut === 'validée') {
+                    html += ' (Adresse: ' + $('<div>').text(p.adresse || 'à définir').html() +
+                            ', Heure: ' + $('<div>').text(p.heure || 'à définir').html() + ')';
+                }
+                html += '</li>';
+            });
+            html += '</ul>';
+            prestList.html(html);
+        }
 
-            // Mettre à jour la facture
-            var factureDiv = $('#facture_' + reservationId);
-            if (factureDiv.length && res.facture) {
-                var rows = '';
-                $.each(res.facture.lignes, function(i, ligne) {
-                    var montant = parseFloat(ligne.montant).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
-                    rows += '<tr><td>' + $('<div>').text(ligne.label).html() +
-                            '</td><td>' + montant + ' €</td></tr>';
-                });
-                var total = parseFloat(res.facture.total).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
-                rows += '<tr class="table-secondary"><th>Total prévisionnel</th><th>' + total + ' €</th></tr>';
-                factureDiv.find('tbody').html(rows);
-            }
+        // Mettre à jour la facture
+        var factureDiv = $('#facture_' + reservationId);
+        if (factureDiv.length && res.facture) {
+            var rows = '';
+            $.each(res.facture.lignes, function(i, ligne) {
+                var montant = parseFloat(ligne.montant).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+                rows += '<tr><td>' + $('<div>').text(ligne.label).html() +
+                        '</td><td>' + montant + ' €</td></tr>';
+            });
+            var total = parseFloat(res.facture.total).toLocaleString('fr-FR', { minimumFractionDigits: 2 });
+            rows += '<tr class="table-secondary"><th>Total prévisionnel</th><th>' + total + ' €</th></tr>';
+            factureDiv.find('tbody').html(rows);
         }
     });
 }
@@ -245,53 +244,50 @@ function loadPlannedActivities(reservationId) {
         url: 'includes/api/activite.php',
         method: 'GET',
         data: { action: 'client', reservation_id: reservationId },
-        dataType: 'json',
-        success: function(activities) {
-            var container = $('#planned_activities_' + reservationId);
-            if (activities.length === 0) {
-                container.html('<p class="text-muted"><small>Aucune activité planifiée pour l\'instant.</small></p>');
-                return;
-            }
-            var html = '<div class="card mb-3 border-success">' +
-                '<div class="card-header bg-success text-white">Activités planifiées</div>' +
-                '<div class="card-body"><ul class="list-group list-group-flush">';
-
-            $.each(activities, function(i, pa) {
-                var dateFormate = new Date(pa.date).toLocaleDateString('fr-FR');
-                var creneauLabel = { heure: 'à l\'heure', 'demi-journee': 'demi-journée', journee: 'journée' }[pa.creneau] || pa.creneau;
-                html += '<li class="list-group-item">' +
-                    '<strong>' + $('<div>').text(pa.activity_nom).html() + '</strong> — ' +
-                    dateFormate + ' à ' + (pa.heure || '?') + ' (' + creneauLabel + ')' +
-                    ' — Animateur : ' + $('<div>').text(pa.animateur).html() +
-                    '<br><small class="text-muted">Participants : ';
-
-                var noms = [];
-                $.each(pa.participants, function(j, p) { noms.push($('<div>').text(p.user_nom + ' (' + p.nb_personnes + ' pers.)').html()); });
-                html += noms.join(', ') + '</small>';
-
-                // Messages des participants (visibles par tous)
-                var messagesHtml = '';
-                $.each(pa.participants, function(j, p) {
-                    if (p.message_participant) {
-                        messagesHtml += '<div class="text-muted small mt-1">' +
-                            '<em>' + $('<div>').text(p.user_nom).html() + ' : &laquo; ' +
-                            $('<div>').text(p.message_participant).html() + ' &raquo;</em></div>';
-                    }
-                });
-                if (messagesHtml) html += '<div class="mt-1">' + messagesHtml + '</div>';
-
-                // Formulaire pour ajouter / modifier son propre message
-                html += '<form class="activity-message-form mt-2" data-planned-id="' + pa.id + '">' +
-                    '<div class="input-group input-group-sm">' +
-                    '<input type="text" name="message" class="form-control" placeholder="Ajouter un message pour les participants...">' +
-                    '<button type="submit" class="btn btn-outline-secondary btn-sm">Envoyer</button>' +
-                    '</div></form>';
-
-                html += '</li>';
-            });
-            html += '</ul></div></div>';
-            container.html(html);
+        dataType: 'json'
+    }).done(function(activities) {
+        var container = $('#planned_activities_' + reservationId);
+        if (activities.length === 0) {
+            container.html('<p class="text-muted"><small>Aucune activité planifiée pour l\'instant.</small></p>');
+            return;
         }
+        var html = '<div class="card mb-3 border-success">' +
+            '<div class="card-header bg-success text-white">Activités planifiées</div>' +
+            '<div class="card-body"><ul class="list-group list-group-flush">';
+
+        $.each(activities, function(i, pa) {
+            var dateFormate = new Date(pa.date).toLocaleDateString('fr-FR');
+            var creneauLabel = { heure: 'à l\'heure', 'demi-journee': 'demi-journée', journee: 'journée' }[pa.creneau] || pa.creneau;
+            html += '<li class="list-group-item">' +
+                '<strong>' + $('<div>').text(pa.activity_nom).html() + '</strong> — ' +
+                dateFormate + ' à ' + (pa.heure || '?') + ' (' + creneauLabel + ')' +
+                ' — Animateur : ' + $('<div>').text(pa.animateur).html() +
+                '<br><small class="text-muted">Participants : ';
+
+            var noms = [];
+            $.each(pa.participants, function(j, p) { noms.push($('<div>').text(p.user_nom + ' (' + p.nb_personnes + ' pers.)').html()); });
+            html += noms.join(', ') + '</small>';
+
+            var messagesHtml = '';
+            $.each(pa.participants, function(j, p) {
+                if (p.message_participant) {
+                    messagesHtml += '<div class="text-muted small mt-1">' +
+                        '<em>' + $('<div>').text(p.user_nom).html() + ' : &laquo; ' +
+                        $('<div>').text(p.message_participant).html() + ' &raquo;</em></div>';
+                }
+            });
+            if (messagesHtml) html += '<div class="mt-1">' + messagesHtml + '</div>';
+
+            html += '<form class="activity-message-form mt-2" data-planned-id="' + pa.id + '">' +
+                '<div class="input-group input-group-sm">' +
+                '<input type="text" name="message" class="form-control" placeholder="Ajouter un message pour les participants...">' +
+                '<button type="submit" class="btn btn-outline-secondary btn-sm">Envoyer</button>' +
+                '</div></form>';
+
+            html += '</li>';
+        });
+        html += '</ul></div></div>';
+        container.html(html);
     });
 }
 
@@ -316,18 +312,14 @@ $(document).ready(function(){
             url: 'includes/api/activite.php',
             method: 'POST',
             data: form.serialize() + '&reservation_id=' + reservationId + '&action=demande',
-            dataType: 'json',
-            success: function(res) {
-                alert(res.message);
-                if (res.success) {
-                    form[0].reset();
-                }
-                btn.prop('disabled', false);
-            },
-            error: function() {
-                alert('Erreur lors de l\'envoi de la demande.');
-                btn.prop('disabled', false);
-            }
+            dataType: 'json'
+        }).done(function(res) {
+            alert(res.message);
+            if (res.success) form[0].reset();
+            btn.prop('disabled', false);
+        }).fail(function() {
+            alert('Erreur lors de l\'envoi de la demande.');
+            btn.prop('disabled', false);
         });
     });
 
@@ -343,16 +335,11 @@ $(document).ready(function(){
             url: 'includes/api/activite.php',
             method: 'POST',
             data: { action: 'message', planned_id: plannedId, message: message },
-            dataType: 'json',
-            success: function(res) {
-                alert(res.message);
-                if (res.success) {
-                    // Recharger la section activités pour afficher le nouveau message
-                    loadPlannedActivities(resId);
-                }
-            },
-            error: function() { alert('Erreur lors de l\'envoi du message.'); }
-        });
+            dataType: 'json'
+        }).done(function(res) {
+            alert(res.message);
+            if (res.success) loadPlannedActivities(resId);
+        }).fail(function() { alert('Erreur lors de l\'envoi du message.'); });
     });
 
     // Charger le catalogue des prestations disponibles via AJAX
@@ -360,20 +347,19 @@ $(document).ready(function(){
         url: 'includes/api/prestation.php',
         method: 'GET',
         data: { action: 'liste' },
-        dataType: 'json',
-        success: function(data) {
-            var html = '';
-            $.each(data, function(i, p) {
-                html += '<div class="col-md-6 col-lg-4 mb-4">' +
-                    '<div class="card h-100"><div class="card-body d-flex flex-column">' +
-                    '<h5 class="card-title">' + $('<div>').text(p.name).html() + '</h5>' +
-                    '<p class="card-text">' + $('<div>').text(p.description).html() + '</p>' +
-                    '<p class="mt-auto"><strong>' + p.price + '€</strong> - <small>' + $('<div>').text(p.type_tarification).html() + '</small></p>' +
-                    '<button class="btn btn-primary btn-sm mt-2 add-prestation" data-id="' + p.id + '">Ajouter</button>' +
-                    '</div></div></div>';
-            });
-            $('#prestationsContainer').html(html);
-        }
+        dataType: 'json'
+    }).done(function(data) {
+        var html = '';
+        $.each(data, function(i, p) {
+            html += '<div class="col-md-6 col-lg-4 mb-4">' +
+                '<div class="card h-100"><div class="card-body d-flex flex-column">' +
+                '<h5 class="card-title">' + $('<div>').text(p.name).html() + '</h5>' +
+                '<p class="card-text">' + $('<div>').text(p.description).html() + '</p>' +
+                '<p class="mt-auto"><strong>' + p.price + '€</strong> - <small>' + $('<div>').text(p.type_tarification).html() + '</small></p>' +
+                '<button class="btn btn-primary btn-sm mt-2 add-prestation" data-id="' + p.id + '">Ajouter</button>' +
+                '</div></div></div>';
+        });
+        $('#prestationsContainer').html(html);
     });
 
     // Ajouter une prestation via AJAX et mettre à jour la carte sans rechargement
@@ -386,19 +372,14 @@ $(document).ready(function(){
             url: 'includes/api/prestation.php',
             method: 'POST',
             data: { action: 'ajouter', id: prestationId },
-            dataType: 'json',
-            success: function(res) {
-                alert(res.message);
-                if (res.success && res.reservation_id) {
-                    // Mettre à jour la carte concernée sans recharger la page
-                    updateReservationCard(res.reservation_id);
-                }
-                btn.prop('disabled', false);
-            },
-            error: function() {
-                alert("Erreur lors de l'ajout de la prestation.");
-                btn.prop('disabled', false);
-            }
+            dataType: 'json'
+        }).done(function(res) {
+            alert(res.message);
+            if (res.success && res.reservation_id) updateReservationCard(res.reservation_id);
+            btn.prop('disabled', false);
+        }).fail(function() {
+            alert("Erreur lors de l'ajout de la prestation.");
+            btn.prop('disabled', false);
         });
     });
     <?php endif; ?>
@@ -409,19 +390,18 @@ function refreshReservations() {
     $.ajax({
         url: 'refresh_reservations.php',
         method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            $.each(data, function(i, res) {
-                var badge = $('#statut_resa_' + res.id);
-                if (badge.length) {
-                    badge.text(res.statut.charAt(0).toUpperCase() + res.statut.slice(1));
-                    badge.removeClass('bg-success bg-warning bg-danger text-dark');
-                    if (res.statut === 'validée')       badge.addClass('bg-success');
-                    else if (res.statut === 'refusée')  badge.addClass('bg-danger');
-                    else                                badge.addClass('bg-warning text-dark');
-                }
-            });
-        }
+        dataType: 'json'
+    }).done(function(data) {
+        $.each(data, function(i, res) {
+            var badge = $('#statut_resa_' + res.id);
+            if (badge.length) {
+                badge.text(res.statut.charAt(0).toUpperCase() + res.statut.slice(1));
+                badge.removeClass('bg-success bg-warning bg-danger text-dark');
+                if (res.statut === 'validée')       badge.addClass('bg-success');
+                else if (res.statut === 'refusée')  badge.addClass('bg-danger');
+                else                                badge.addClass('bg-warning text-dark');
+            }
+        });
     });
 }
 

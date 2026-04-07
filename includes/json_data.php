@@ -8,28 +8,41 @@
 
     // Retourner le contenu du fichier json passé en paramètre
     function readJson($fileName) {
-        // Récupérer le chemin du fichier JSON
         $chemin = jsonPath($fileName);
-        // Vérifier si le fichier existe
-        if (file_exists($chemin)) {
-            // Lire le contenu du fichier JSON
-            $jsonContent = file_get_contents($chemin);
-            // Convertir le contenu JSON en tableau associatif
-            $data = json_decode($jsonContent, true);
-            return $data ? $data : [];
-        } else {
-            // Si le fichier n'existe pas, retourner un tableau vide
+        if (!file_exists($chemin)) return [];
+
+        $f = fopen($chemin, 'r');
+        // Verrou partagé : plusieurs lectures simultanées autorisées
+        if (!flock($f, LOCK_SH)) {
+            fclose($f);
             return [];
         }
+        $taille = filesize($chemin);
+        $jsonContent = $taille > 0 ? fread($f, $taille) : '[]';
+        flock($f, LOCK_UN);
+        fclose($f);
+
+        $data = json_decode($jsonContent, true);
+        return $data ? $data : [];
     }
-    // ecrire sur un fichier json
+
+    // Ecrire sur un fichier json avec verrou exclusif
     function writeJson($fileName, $data) {
-        // Chemin vers le fichier json
         $chemin = jsonPath($fileName);
-        // chemin formaté 
+        // c+ : lecture/écriture, crée le fichier s'il n'existe pas
+        $f = fopen($chemin, 'c+');
+        // Verrou exclusif : aucune autre lecture/écriture simultanée
+        if (!flock($f, LOCK_EX)) {
+            fclose($f);
+            http_response_code(409); // Conflict
+            return;
+        }
         $jsonContent = json_encode($data, JSON_PRETTY_PRINT);
-        
-        file_put_contents($chemin, $jsonContent); 
+        ftruncate($f, 0);
+        fseek($f, 0);
+        fwrite($f, $jsonContent);
+        flock($f, LOCK_UN);
+        fclose($f);
     }
 
     // Ajouter un élément

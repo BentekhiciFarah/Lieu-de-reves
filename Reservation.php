@@ -295,26 +295,20 @@ $(document).ready(function () {
             url: 'includes/api/reservation.php',
             method: 'POST',
             data: $(this).serialize(),
-            dataType: 'json',
-            success: function (res) {
-                msgDiv
-                    .removeClass('d-none')
-                    .addClass(res.success ? 'alert alert-success' : 'alert alert-danger')
-                    .text(res.message);
-
-                if (res.success) {
-                    $('#reservationForm')[0].reset();
-                }
-            },
-            error: function () {
-                msgDiv
-                    .removeClass('d-none')
-                    .addClass('alert alert-danger')
-                    .text('Une erreur est survenue, veuillez réessayer.');
-            },
-            complete: function () {
-                btn.prop('disabled', false).text('Envoyer ma demande');
-            }
+            dataType: 'json'
+        }).done(function (res) {
+            msgDiv
+                .removeClass('d-none')
+                .addClass(res.success ? 'alert alert-success' : 'alert alert-danger')
+                .text(res.message);
+            if (res.success) $('#reservationForm')[0].reset();
+        }).fail(function () {
+            msgDiv
+                .removeClass('d-none')
+                .addClass('alert alert-danger')
+                .text('Une erreur est survenue, veuillez réessayer.');
+        }).always(function () {
+            btn.prop('disabled', false).text('Envoyer ma demande');
         });
     });
 });
