@@ -173,12 +173,67 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
             </tbody>
         </table>
         </div>
-    <?php endif; ?>
+                <?php if ($facture['total'] > 0): ?>
+        <button class="btn btn-success mt-2"
+                data-bs-toggle="modal"
+                data-bs-target="#modalPaiement_<?= $res['id'] ?>"
+                data-total="<?= number_format($facture['total'], 2, '.', '') ?>">
+             Payer 
+        </button>
+
+        <div class="modal fade" id="modalPaiement_<?= $res['id'] ?>" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Paiement de la réservation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form class="form-paiement" data-reservation-id="<?= $res['id'] ?>">
+                            <div class="mb-3">
+                                <label class="form-label">Titulaire de la carte</label>
+                                <input type="text" name="titulaire" class="form-control"
+                                       placeholder="Jean Dupont" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Numéro de carte</label>
+                                <input type="text" name="numero_carte" class="form-control"
+                                       placeholder="1234 5678 9012 3456"
+                                       maxlength="19" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">Date d'expiration</label>
+                                    <input type="text" name="expiration" class="form-control"
+                                           placeholder="MM/AA" maxlength="5" required>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" name="cvv" class="form-control"
+                                           placeholder="123" maxlength="3" required>
+                                </div>
+                            </div>
+                            <div class="alert alert-warning py-2">
+                                <small> Simulation uniquement — aucune donnée réelle n'est traitée</small>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100">
+                                Confirmer le paiement 
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
+    <?php endif; ?>  <!-- fin if ($facture) -->
 
     <?php
         endif;
     endforeach;
     ?>
+
+
 
     <?php if (!$found): ?>
         <div class="alert alert-info">Aucune réservation trouvée.</div>
@@ -193,6 +248,7 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
     <?php endif; ?>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 // Met à jour la liste des prestations et la facture d'une réservation sans rechargement
@@ -381,6 +437,27 @@ $(document).ready(function(){
             alert("Erreur lors de l'ajout de la prestation.");
             btn.prop('disabled', false);
         });
+    });
+
+    // Formatage automatique du numéro de carte (groupes de 4)
+    $(document).on('input', 'input[name="numero_carte"]', function() {
+        var val = $(this).val().replace(/\D/g, '').substring(0, 16);
+        $(this).val(val.replace(/(.{4})/g, '$1 ').trim());
+    });
+
+    // Soumission du formulaire de paiement (simulation)
+    $(document).on('submit', '.form-paiement', function(e) {
+        e.preventDefault();
+        var reservationId = $(this).data('reservation-id');
+        var btn = $(this).find('button[type="submit"]');
+        btn.prop('disabled', true).text('Traitement en cours...');
+
+        // Simulation d'un délai de traitement
+        setTimeout(function() {
+            $('#modalPaiement_' + reservationId).modal('hide');
+            alert(' Paiement simulé avec succès !');
+            btn.prop('disabled', false);
+        }, 1500);
     });
     <?php endif; ?>
 });

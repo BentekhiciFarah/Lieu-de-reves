@@ -117,5 +117,21 @@
         "email": "za@gmail.com",
         "password": "$2y$10$6fxFu9Yfm29ro4ImrqSxBOjV8gmkH88IWRmSXq7O4llDeSucho1vy",
         "role": "client"
+    },
+    {
+        "id": "17755504619584",
+        "nom": "ifoizkzsh",
+        "prenom": "",
+        "email": "hdiuhc@gmail.com",
+        "password": "$2y$10$Eu9Mr5\/YIc41R67jDamOF.z6LJ1g\/rWMtFBRoPBIoT\/qZUfZkz7bK",
+        "role": "client"
+    },
+    {
+        "id": "17755859837646",
+        "nom": "Juju",
+        "prenom": "",
+        "email": "juju@juju.com",
+        "password": "$2y$10$yS..qOShTnfohRjAyFf4ieO5KPergIfM\/wOZFISbbfM7BxF1mXMpu",
+        "role": "client"
     }
 ]

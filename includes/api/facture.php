@@ -1,6 +1,6 @@
 <?php
 
-// ── Fonctions de calcul ──────────────────────────────────────────────────────
+// ── Fonctions de calcul 
 
 function calculerNombreNuits($dateDebut, $dateFin) {
     $debut    = new DateTime($dateDebut);
@@ -106,7 +106,7 @@ function calculerFactureReservation($reservation, $roomTypes, $prestationsClient
     ];
 }
 
-// ── Endpoint API (uniquement si appelé directement) ──────────────────────────
+// ── Endpoint API (uniquement si appelé directement) 
 
 if (realpath($_SERVER['SCRIPT_FILENAME']) === __FILE__) {
     session_start();
