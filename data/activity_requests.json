@@ -1,120 +1,28 @@
 [
     {
-        "id": "17754860156497",
-        "reservation_id": "17754857142246",
-        "user_email": "ax@gmail.com",
-        "user_nom": "amine",
-        "activity_id": 2,
-        "activity_nom": "Sortie en bateau",
-        "creneau": "demi-journee",
-        "nb_personnes": 3,
-        "message": "",
-        "statut": "planifiee",
-        "date_creation": "2026-04-06 16:33:35"
-    },
-    {
-        "id": "17755142886759",
-        "reservation_id": "17755142116884",
-        "user_email": "Aze@gmail.com",
-        "user_nom": "amine",
+        "id": "17755876162977",
+        "reservation_id": "17755875662172",
+        "user_email": "youpi@youpi.com",
+        "user_nom": "youpi",
         "activity_id": 1,
         "activity_nom": "Plong\u00e9e sous-marine",
         "creneau": "demi-journee",
         "nb_personnes": 1,
         "message": "",
         "statut": "en_attente",
-        "date_creation": "2026-04-07 00:24:48"
+        "date_creation": "2026-04-07 20:46:56"
     },
     {
-        "id": "17755143861002",
-        "reservation_id": "17755142116884",
-        "user_email": "Aze@gmail.com",
-        "user_nom": "amine",
-        "activity_id": 2,
-        "activity_nom": "Sortie en bateau",
-        "creneau": "demi-journee",
-        "nb_personnes": 4,
-        "message": "",
-        "statut": "planifiee",
-        "date_creation": "2026-04-07 00:26:26"
-    },
-    {
-        "id": "17755153459698",
-        "reservation_id": "17755152569537",
-        "user_email": "za@gmail.com",
-        "user_nom": "az",
+        "id": "17755878628337",
+        "reservation_id": "17755878116892",
+        "user_email": "farah@gmail.com",
+        "user_nom": "Farah",
         "activity_id": 1,
         "activity_nom": "Plong\u00e9e sous-marine",
         "creneau": "demi-journee",
         "nb_personnes": 2,
         "message": "",
         "statut": "planifiee",
-        "date_creation": "2026-04-07 00:42:25"
-    },
-    {
-        "id": "17755153859722",
-        "reservation_id": "17755152569537",
-        "user_email": "za@gmail.com",
-        "user_nom": "az",
-        "activity_id": 1,
-        "activity_nom": "Plong\u00e9e sous-marine",
-        "creneau": "demi-journee",
-        "nb_personnes": 3,
-        "message": "",
-        "statut": "planifiee",
-        "date_creation": "2026-04-07 00:43:05"
-    },
-    {
-<<<<<<< HEAD
-        "id": "17755505278385",
-        "reservation_id": "17755504376295",
-        "user_email": "hdiuhc@gmail.com",
-        "user_nom": "ifoizkzsh",
-        "activity_id": 1,
-        "activity_nom": "Plong\u00e9e sous-marine",
-        "creneau": "demi-journee",
-        "nb_personnes": 3,
-        "message": "",
-        "statut": "en_attente",
-        "date_creation": "2026-04-07 10:28:47"
-=======
-        "id": "17755494849831",
-        "reservation_id": "17755493983347",
-        "user_email": "XX@gmail.com",
-        "user_nom": "XX",
-        "activity_id": 2,
-        "activity_nom": "Sortie en bateau",
-        "creneau": "demi-journee",
-        "nb_personnes": 3,
-        "message": "",
-        "statut": "planifiee",
-        "date_creation": "2026-04-07 10:11:24"
-    },
-    {
-        "id": "17755516306960",
-        "reservation_id": "17755515816567",
-        "user_email": "YY@gmail.com",
-        "user_nom": "YY",
-        "activity_id": 2,
-        "activity_nom": "Sortie en bateau",
-        "creneau": "demi-journee",
-        "nb_personnes": 5,
-        "message": "",
-        "statut": "planifiee",
-        "date_creation": "2026-04-07 10:47:10"
-    },
-    {
-        "id": "17755521777946",
-        "reservation_id": "17755521128121",
-        "user_email": "Ya@gmail.com",
-        "user_nom": "YA",
-        "activity_id": 3,
-        "activity_nom": "Paddle \/ Kayak",
-        "creneau": "demi-journee",
-        "nb_personnes": 3,
-        "message": "",
-        "statut": "planifiee",
-        "date_creation": "2026-04-07 10:56:17"
->>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
+        "date_creation": "2026-04-07 20:51:02"
     }
 ]

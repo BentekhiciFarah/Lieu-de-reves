@@ -454,7 +454,10 @@ $(document).ready(function(){
 
         // Simulation d'un délai de traitement
         setTimeout(function() {
-            $('#modalPaiement_' + reservationId).modal('hide');
+            var modal = bootstrap.Modal.getInstance(document.getElementById('modalPaiement_' + reservationId));
+            if (modal) modal.hide();
+            // Cacher le bouton payer de cette réservation
+            $('button[data-bs-target="#modalPaiement_' + reservationId + '"]').hide();
             alert(' Paiement simulé avec succès !');
             btn.prop('disabled', false);
         }, 1500);

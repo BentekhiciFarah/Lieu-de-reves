@@ -1,192 +1,26 @@
 [
     {
-        "id": 12,
-        "nom": "Amine",
-        "email": "amine@mail.com",
-        "date_debut": "2026-06-10",
-        "date_fin": "2026-06-15",
+        "id": "17755875662172",
+        "nom": "youpi",
+        "email": "youpi@youpi.com",
+        "date_debut": "2026-04-07",
+        "date_fin": "2026-04-08",
         "nb_personnes": 2,
-        "type_chambre": "villa",
-        "statut": "valid\u00e9e",
-        "arrhes": 0,
-        "reduction_prestations": 0
-    },
-    {
-        "id": "17752311386421",
-        "nom": "amine",
-        "email": "am@gmail.com",
-        "date_debut": "2026-04-03",
-        "date_fin": "2026-04-10",
-        "nb_personnes": "2",
-        "type_chambre": "suite",
-        "activites": [
-            "2"
-        ],
-        "message": "",
-        "statut": "valid\u00e9e",
-        "date_creation": "2026-04-03 17:45:38",
-        "arrhes": 0,
-        "reduction_prestations": 0
-    },
-    {
-        "id": "17752311579463",
-        "nom": "amine",
-        "email": "az@gmail.com",
-        "date_debut": "2026-04-03",
-        "date_fin": "2026-04-10",
-        "nb_personnes": "2",
-        "type_chambre": "suite",
-        "activites": [
-            "2"
-        ],
-        "message": "",
-        "statut": "valid\u00e9e",
-        "date_creation": "2026-04-03 17:45:57",
-        "arrhes": 0,
-        "reduction_prestations": 0
-    },
-    {
-        "id": "17754857142246",
-        "nom": "amine",
-        "email": "ax@gmail.com",
-        "date_debut": "2026-04-09",
-        "date_fin": "2026-04-15",
-        "nb_personnes": "4",
-        "type_chambre": "villa",
-        "activites": [
-            "1"
-        ],
-        "message": "",
-        "statut": "valid\u00e9e",
-        "date_creation": "2026-04-06 16:28:34",
-        "arrhes": 10,
-        "reduction_prestations": 10
-    },
-    {
-        "id": "17755142116884",
-        "nom": "amine",
-        "email": "Aze@gmail.com",
-        "date_debut": "2026-04-08",
-        "date_fin": "2026-04-10",
-        "nb_personnes": "6",
-        "type_chambre": "villa",
-        "activites": [],
-        "message": "",
-        "statut": "valid\u00e9e",
-        "date_creation": "2026-04-07 00:23:31"
-    },
-    {
-        "id": "17755152569537",
-        "nom": "az",
-        "email": "za@gmail.com",
-        "date_debut": "2026-04-08",
-        "date_fin": "2026-04-11",
-        "nb_personnes": 7,
         "type_chambre": "bungalow",
-        "activites": [],
         "message": "",
         "statut": "valid\u00e9e",
-        "date_creation": "2026-04-07 00:40:56"
+        "date_creation": "2026-04-07 20:46:06"
     },
     {
-<<<<<<< HEAD
-        "id": "17755500713664",
-        "nom": "Ho",
-        "email": "uihcu@gmail.com",
-        "date_debut": "2026-05-14",
-        "date_fin": "2026-06-12",
-        "nb_personnes": 3,
-        "type_chambre": "villa",
-        "activites": [
-            "1",
-            "6"
-        ],
-        "message": "",
-        "statut": "en_attente",
-        "date_creation": "2026-04-07 10:21:11"
-    },
-    {
-        "id": "17755503084889",
-        "nom": "hey",
-        "email": "hey@gmail.com",
-        "date_debut": "2026-04-10",
-        "date_fin": "2026-04-23",
-        "nb_personnes": 6,
-        "type_chambre": "bungalow",
-        "activites": [
-            "1"
-        ],
-        "message": "",
-        "statut": "valid\u00e9e",
-        "date_creation": "2026-04-07 10:25:08"
-    },
-    {
-        "id": "17755504376295",
-        "nom": "ifoizkzsh",
-        "email": "hdiuhc@gmail.com",
-        "date_debut": "2026-04-08",
-        "date_fin": "2026-04-17",
-        "nb_personnes": 3,
-        "type_chambre": "bungalow",
-        "activites": [
-            "1"
-        ],
-        "message": "",
-        "statut": "valid\u00e9e",
-        "date_creation": "2026-04-07 10:27:17"
-    },
-    {
-        "id": "17755859458508",
-        "nom": "Juju",
-        "email": "juju@juju.com",
-        "date_debut": "2026-04-23",
-        "date_fin": "2026-05-10",
+        "id": "17755878116892",
+        "nom": "Farah",
+        "email": "farah@gmail.com",
+        "date_debut": "2026-04-29",
+        "date_fin": "2026-05-14",
         "nb_personnes": 2,
-=======
-        "id": "17755493983347",
-        "nom": "XX",
-        "email": "XX@gmail.com",
-        "date_debut": "2026-04-10",
-        "date_fin": "2026-04-14",
-        "nb_personnes": 4,
->>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
-        "type_chambre": "bungalow",
-        "activites": [],
-        "message": "",
-        "statut": "valid\u00e9e",
-<<<<<<< HEAD
-        "date_creation": "2026-04-07 20:19:05"
-=======
-        "date_creation": "2026-04-07 10:09:58"
-    },
-    {
-        "id": "17755515816567",
-        "nom": "YY",
-        "email": "YY@gmail.com",
-        "date_debut": "2026-04-09",
-        "date_fin": "2026-04-23",
-        "nb_personnes": 5,
-        "type_chambre": "bungalow",
-        "activites": [
-            "1"
-        ],
-        "message": "",
-        "statut": "valid\u00e9e",
-        "date_creation": "2026-04-07 10:46:21"
-    },
-    {
-        "id": "17755521128121",
-        "nom": "YA",
-        "email": "Ya@gmail.com",
-        "date_debut": "2026-04-10",
-        "date_fin": "2026-04-15",
-        "nb_personnes": 5,
         "type_chambre": "bungalow",
         "message": "",
         "statut": "valid\u00e9e",
-        "date_creation": "2026-04-07 10:55:12",
-        "reduction_prestations": 10,
-        "arrhes": 100
->>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
+        "date_creation": "2026-04-07 20:50:11"
     }
 ]

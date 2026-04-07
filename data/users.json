@@ -1,161 +1,18 @@
 [
     {
-        "id": 1,
-        "nom": "Dupont",
-        "prenom": "Jean",
-        "email": "jean.dupont@example.com",
-        "password ": "motdepasse123"
-    },
-    {
-        "id": "17739659528109",
-        "nom": "amine",
-        "email": "aminechboukat088@gmail.com",
-        "password": "3623e99135",
-        "role": "client"
-    },
-    {
-        "id": "17745233406201",
-        "nom": "Bentekhici",
-        "email": "bentekhici.farah@gmail.com",
-        "password": "$2y$10$SuvcbZ9msnbjMjlU0SJ36OH5SreHQFettA5in47lYYMjsdkdmFzg.",
-        "role": "client"
-    },
-    {
-        "id": "17745236542594",
-        "nom": "Eve",
-        "email": "farah.bentekhici@universite-paris-saclay.fr",
-        "password": "$2y$10$sElfz5xzH1\/PjCFnlssioOWlIbLMOA5XfV7bUOT2yYiszjjGmzikO",
-        "role": "client"
-    },
-    {
-        "id": "17745237871664",
-        "nom": "loi",
-        "email": "hfhdhdu@gmail.com",
-        "password": "$2y$10$E84qsNISlgMGsHTa3b77iuXu9VFlmHyeq7GT0\/wRndfQgn0PW37ve",
-        "role": "client"
-    },
-    {
-        "id": "17751437571216",
-        "nom": "hey",
-        "email": "hey@gmail.com",
-        "password": "$2y$10$9kjKy.9luRNHDjfZbhiDce2D\/lXWs745RuvcReuyHhaVFbhNPBh02",
-        "role": "client"
-    },
-    {
-        "id": "17751442672307",
-        "nom": "marre",
-        "email": "marre@gmail.com",
-        "password": "$2y$10$LmI29pa3EKP.\/KNNyOdG9u0EbeMSYo.FHfyEIQmiUQOApGeqOMZ2i",
-        "role": "client"
-    },
-    {
-        "id": "17751507135986",
-        "nom": "hola",
-        "email": "hola@gmail.com",
-        "password": "$2y$10$lpMyUvnvo8YfiF3khDKHs.\/uqfeUM1wItlq9ZwMYEz4k\/2HU0REGO",
-        "role": "client"
-    },
-    {
-        "id": "17751524835823",
-        "nom": "moi",
-        "email": "moi@site.com",
-        "password": "$2y$10$0BzX.XrFYh50Cw\/DV1TRk.uUibWjGD4\/VV.gbvyoijNNHfOGrkQN6",
-        "role": "client"
-    },
-    {
-        "id": 10,
-        "nom": "amine",
+        "id": "17755875765310",
+        "nom": "youpi",
         "prenom": "",
-        "email": "aminechbou@gmail.com",
-        "password": "$2y$10$ImmSeVOayZwb4P0HjYKDneWq4VsX4w1FJuxZZ4daR9P0tWfFB3HTO",
+        "email": "youpi@youpi.com",
+        "password": "$2y$10$BZPLYUMMKj6eY2V4JWj4p.BMIcAxYwdnCGsfbD4WoJmYnnAEGRuc6",
         "role": "client"
     },
     {
-        "id": "17751721886484",
-        "nom": "amine",
+        "id": "17755878176759",
+        "nom": "Farah",
         "prenom": "",
-        "email": "amine@gmail.com",
-        "password": "$2y$10$mQ\/O\/X9HoZNoz4TGR8mLJe7cvGB37xX4UVMM9a1SrYWcIYwn6w1m6",
-        "role": "client"
-    },
-    {
-        "id": "17752311669107",
-        "nom": "amine",
-        "prenom": "",
-        "email": "az@gmail.com",
-        "password": "$2y$10$Xs1W1Te7oQrjlmo13pLIZuAmS1gOz9Q0BvbmXHyj6TEFolWP\/QnkK",
-        "role": "client"
-    },
-    {
-        "id": "17754822283898",
-        "nom": "amine",
-        "prenom": "",
-        "email": "am@gmail.com",
-        "password": "$2y$10$aWtgdM96bItHWHlpTMCc8eeMkvSyhlRBwpFb1Xx9myTpnSM1kfZuq",
-        "role": "client"
-    },
-    {
-        "id": "17754857209252",
-        "nom": "amine",
-        "prenom": "",
-        "email": "ax@gmail.com",
-        "password": "$2y$10$x8FbR5b3MdN6UBQvLe1GKOwX0XeE4RWu2qf1mHju727nD9jBD3uJe",
-        "role": "client"
-    },
-    {
-        "id": "17755142205824",
-        "nom": "amine",
-        "prenom": "",
-        "email": "Aze@gmail.com",
-        "password": "$2y$10$\/Ieve2kUljaqJG4.M3Y.gecqVklOgQ6HQGNBemPA50swERaJU5Hf6",
-        "role": "client"
-    },
-    {
-        "id": "17755152955329",
-        "nom": "az",
-        "prenom": "",
-        "email": "za@gmail.com",
-        "password": "$2y$10$6fxFu9Yfm29ro4ImrqSxBOjV8gmkH88IWRmSXq7O4llDeSucho1vy",
-        "role": "client"
-    },
-    {
-<<<<<<< HEAD
-        "id": "17755504619584",
-        "nom": "ifoizkzsh",
-        "prenom": "",
-        "email": "hdiuhc@gmail.com",
-        "password": "$2y$10$Eu9Mr5\/YIc41R67jDamOF.z6LJ1g\/rWMtFBRoPBIoT\/qZUfZkz7bK",
-        "role": "client"
-    },
-    {
-        "id": "17755859837646",
-        "nom": "Juju",
-        "prenom": "",
-        "email": "juju@juju.com",
-        "password": "$2y$10$yS..qOShTnfohRjAyFf4ieO5KPergIfM\/wOZFISbbfM7BxF1mXMpu",
-=======
-        "id": "17755494248232",
-        "nom": "XX",
-        "prenom": "",
-        "email": "XX@gmail.com",
-        "password": "$2y$10$3S.R6X\/EMfNjIPcVNVBFTeFdW07aMPY\/xMBn5g2Ywd04WnC49I1FW",
-        "role": "client"
-    },
-    {
-        "id": "17755515881897",
-        "nom": "YY",
-        "prenom": "",
-        "email": "YY@gmail.com",
-        "password": "$2y$10$z34YEPtuk.QXOOW4kcF35uGk3XZJ0XEYjZPKHBHl3Fao9ZJ0WFfX6",
-        "role": "client"
-    },
-    {
-        "id": "17755521293380",
-        "nom": "YA",
-        "prenom": "",
-        "email": "Ya@gmail.com",
-        "password": "$2y$10$zczV7udggysQ3NeG0xQ26OEDbte06NiPrk8K8T88WiEgG4.qSek8i",
->>>>>>> 552a8d606cc987e191479a23e0969c8a2a9e011a
+        "email": "farah@gmail.com",
+        "password": "$2y$10$wPA3vNX6preW0oHM42S6qeYFudSKIiG0klg15AeTNgZM9UOkewcM2",
         "role": "client"
     }
 ]
