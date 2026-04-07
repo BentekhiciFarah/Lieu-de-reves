@@ -117,5 +117,29 @@
         "email": "za@gmail.com",
         "password": "$2y$10$6fxFu9Yfm29ro4ImrqSxBOjV8gmkH88IWRmSXq7O4llDeSucho1vy",
         "role": "client"
+    },
+    {
+        "id": "17755494248232",
+        "nom": "XX",
+        "prenom": "",
+        "email": "XX@gmail.com",
+        "password": "$2y$10$3S.R6X\/EMfNjIPcVNVBFTeFdW07aMPY\/xMBn5g2Ywd04WnC49I1FW",
+        "role": "client"
+    },
+    {
+        "id": "17755515881897",
+        "nom": "YY",
+        "prenom": "",
+        "email": "YY@gmail.com",
+        "password": "$2y$10$z34YEPtuk.QXOOW4kcF35uGk3XZJ0XEYjZPKHBHl3Fao9ZJ0WFfX6",
+        "role": "client"
+    },
+    {
+        "id": "17755521293380",
+        "nom": "YA",
+        "prenom": "",
+        "email": "Ya@gmail.com",
+        "password": "$2y$10$zczV7udggysQ3NeG0xQ26OEDbte06NiPrk8K8T88WiEgG4.qSek8i",
+        "role": "client"
     }
 ]

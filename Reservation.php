@@ -1,8 +1,5 @@
 <?php
 session_start();
-require_once "includes/json_data.php";
-
-$activitiesData = readJson("activities.json") ?: [];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -180,25 +177,6 @@ $activitiesData = readJson("activities.json") ?: [];
                 </select>
               </div>
 
-              <div class="col-12 mb-3">
-                <label>Activités souhaitées</label>
-                <div class="checkbox-group">
-                  <?php foreach ($activitiesData as $activite): ?>
-                      <label class="checkbox-item">
-                        <input
-                          type="checkbox"
-                          name="activites[]"
-                          value="<?php echo htmlspecialchars($activite['id']); ?>"
-                          >
-                        <?php echo htmlspecialchars($activite['nom']); ?>
-                        <small class="d-block text-muted">
-                          Min: <?php echo (int)$activite['min_participants']; ?> /
-                          Max: <?php echo (int)$activite['max_participants']; ?> personnes
-                        </small>
-                      </label>
-                    <?php endforeach; ?>
-                </div>
-              </div>
 
               <div class="col-12 mb-4">
                 <label for="message">Message</label>

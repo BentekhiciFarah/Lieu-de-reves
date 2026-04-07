@@ -16,7 +16,6 @@ $dateDebut   = $_POST['date_debut'] ?? '';
 $dateFin     = $_POST['date_fin'] ?? '';
 $nbPersonnes = (int)($_POST['nb_personnes'] ?? 0);
 $typeChambre = $_POST['type_chambre'] ?? '';
-$activites   = $_POST['activites'] ?? [];
 $message     = trim($_POST['message'] ?? '');
 
 // Validation des champs obligatoires
@@ -45,37 +44,6 @@ if ($nbPersonnes < 1) {
     exit;
 }
 
-// Validation des activités sélectionnées
-$activitiesData = readJson("activities.json") ?: [];
-
-foreach ($activites as $activiteId) {
-    $activiteTrouvee = false;
-
-    foreach ($activitiesData as $activite) {
-        if ((string)$activite['id'] === (string)$activiteId) {
-            $activiteTrouvee = true;
-            $nomActivite     = $activite['nom'] ?? 'Activité';
-            $minParticipants = (int)($activite['min_participants'] ?? 1);
-            $maxParticipants = (int)($activite['max_participants'] ?? PHP_INT_MAX);
-
-            if ($nbPersonnes < $minParticipants) {
-                echo json_encode(['success' => false, 'message' => "L'activité \"{$nomActivite}\" nécessite au minimum {$minParticipants} participants."]);
-                exit;
-            }
-            if ($nbPersonnes > $maxParticipants) {
-                echo json_encode(['success' => false, 'message' => "L'activité \"{$nomActivite}\" accepte au maximum {$maxParticipants} participants."]);
-                exit;
-            }
-            break;
-        }
-    }
-
-    if (!$activiteTrouvee) {
-        echo json_encode(['success' => false, 'message' => 'Une activité sélectionnée est invalide.']);
-        exit;
-    }
-}
-
 // Enregistrement de la réservation
 $reservations = readJson("reservation.json") ?: [];
 
@@ -87,7 +55,6 @@ $nouvelleReservation = [
     'date_fin'      => $dateFin,
     'nb_personnes'  => $nbPersonnes,
     'type_chambre'  => $typeChambre,
-    'activites'     => $activites,
     'message'       => $message,
     'statut'        => 'en_attente',
     'date_creation' => date('Y-m-d H:i:s')
