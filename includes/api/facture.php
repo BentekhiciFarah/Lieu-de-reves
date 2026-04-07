@@ -60,6 +60,9 @@ function calculerFactureReservation($reservation, $roomTypes, $prestationsClient
     }
 
     foreach ($activitesPlanifiees as $pa) {
+        // Ignorer les activités avec une date invalide
+        if (empty($pa['date']) || !strtotime($pa['date'])) continue;
+
         foreach (($pa['participants'] ?? []) as $participant) {
             if ($participant['reservation_id'] == ($reservation['id'] ?? null)) {
                 $nbPers  = (int)($participant['nb_personnes'] ?? 1);

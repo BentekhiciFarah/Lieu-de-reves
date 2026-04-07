@@ -14,5 +14,21 @@
         "email": "farah@gmail.com",
         "password": "$2y$10$wPA3vNX6preW0oHM42S6qeYFudSKIiG0klg15AeTNgZM9UOkewcM2",
         "role": "client"
+    },
+    {
+        "id": "17755931256719",
+        "nom": "amine",
+        "prenom": "",
+        "email": "aminechboukat088@gmail.com",
+        "password": "$2y$10$9HXWsI\/i6TKeRCYtYISZV.\/wDlpogIpttF8KeiNMEknzjTGPCa\/eW",
+        "role": "client"
+    },
+    {
+        "id": "17755936866566",
+        "nom": "az",
+        "prenom": "",
+        "email": "az@gmail.com",
+        "password": "$2y$10$jV5ObPevx08J0ASDcC0i0e8.cMiC9Ww33TlMkQ.NWflMRT3IYalRG",
+        "role": "client"
     }
 ]

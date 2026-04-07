@@ -588,6 +588,12 @@ function renderActivityRequests(requests, date) {
 
         // Champs de planification
         html += '<div class="row mt-3 g-2">' +
+            // Champ date uniquement en mode "toutes les dates"
+            (date === 'all' ?
+                '<div class="col-md-3">' +
+                    '<label class="form-label">Date <span class="text-danger">*</span></label>' +
+                    '<input type="date" name="date_planification" class="form-control" required>' +
+                '</div>' : '') +
             '<div class="col-md-4">' +
                 '<label class="form-label">Animateur</label>' +
                 '<select name="animateur" class="form-select" required>' + animateursOptions + '</select>' +
@@ -656,7 +662,10 @@ $(document).ready(function(){
             return;
         }
 
-        var data = form.serialize() + '&activity_id=' + activityId + '&date=' + encodeURIComponent(date) + '&action=planifier';
+        // En mode "toutes les dates", la date vient du champ du formulaire
+        var dateFinale = (date === 'all') ? form.find('input[name="date_planification"]').val() : date;
+        if (!dateFinale) { alert('Veuillez saisir une date.'); return; }
+        var data = form.serialize() + '&activity_id=' + activityId + '&date=' + encodeURIComponent(dateFinale) + '&action=planifier';
 
         $.ajax({
             url: 'includes/api/activite.php',
