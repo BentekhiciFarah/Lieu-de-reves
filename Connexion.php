@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérification client via JSON
     $users = readJson("users.json");
 
+    // Parcours des utilisateurs pour trouver une correspondance
     foreach ($users as $user) {
         if ($user['email'] === $email && password_verify($password, $user['password'])) {
             $_SESSION['role'] = "client";

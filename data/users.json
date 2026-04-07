@@ -30,5 +30,13 @@
         "email": "az@gmail.com",
         "password": "$2y$10$jV5ObPevx08J0ASDcC0i0e8.cMiC9Ww33TlMkQ.NWflMRT3IYalRG",
         "role": "client"
+    },
+    {
+        "id": "17755946505208",
+        "nom": "potit",
+        "prenom": "",
+        "email": "potit@gmail.com",
+        "password": "$2y$10$C2iXn.WbPAOO5wjo7cYsteqTMrxrrU8lp8Brw4pFShMnZsWVYY00G",
+        "role": "client"
     }
 ]

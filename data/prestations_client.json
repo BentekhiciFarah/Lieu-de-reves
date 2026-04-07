@@ -54,5 +54,19 @@
         "statut": "valid\u00e9e",
         "adresse": "",
         "heure": ""
+    },
+    {
+        "user_email": "potit@gmail.com",
+        "reservation_id": "17755946306754",
+        "prestation": {
+            "id": 2,
+            "name": "Petit d\u00e9jeuner en chambre",
+            "description": "Service de petit d\u00e9jeuner livr\u00e9 directement dans la chambre.",
+            "price": 20,
+            "type_tarification": "par_personne"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
     }
 ]

@@ -1,8 +1,9 @@
 <?php
+
+// Client.php : Espace client pour consulter ses réservations, prestations et activités
 session_start();
 // Inclure les fonctions de gestion des données JSON
 require_once "includes/json_data.php";
-
 require_once "includes/json_data.php";
 require_once "includes/api/facture.php";
 
@@ -15,6 +16,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== "client") {
 // Récupérer l'email de l'utilisateur connecté
 $email = $_SESSION['email'] ?? '';
 
+// Charger les données nécessaires
 $reservations      = readJson("reservation.json") ?: [];
 $prestations_client = readJson("prestations_client.json") ?: [];
 $roomTypes         = readJson("room_types.json") ?: [];

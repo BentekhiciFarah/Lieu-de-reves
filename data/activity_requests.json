@@ -94,5 +94,19 @@
         "message": "",
         "statut": "planifiee",
         "date_creation": "2026-04-07 22:37:12"
+    },
+    {
+        "id": "17755947076051",
+        "reservation_id": "17755946306754",
+        "user_email": "potit@gmail.com",
+        "user_nom": "potit",
+        "activity_id": 1,
+        "activity_nom": "Plong\u00e9e sous-marine",
+        "creneau": "heure",
+        "date_souhaitee": "2026-04-16",
+        "nb_personnes": 1,
+        "message": "",
+        "statut": "en_attente",
+        "date_creation": "2026-04-07 22:45:07"
     }
 ]
