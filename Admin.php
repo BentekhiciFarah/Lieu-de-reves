@@ -196,6 +196,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['section']) && $_GET['se
     exit;
 }
 
+// Handler AJAX GET : retourne les demandes d'activités en attente avec infos de réservation
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['section']) && $_GET['section'] === 'activites_all') {
+    header('Content-Type: application/json');
+    $demandes     = readJson("activity_requests.json") ?: [];
+    $reservations = readJson("reservation.json") ?: [];
+
+    $resMap = [];
+    foreach ($reservations as $res) $resMap[$res['id']] = $res;
+
+    $resultat = [];
+    foreach ($demandes as $dem) {
+        if (($dem['statut'] ?? '') !== 'en_attente') continue;
+        $res = $resMap[$dem['reservation_id']] ?? null;
+        if (!$res) continue;
+        $resultat[] = array_merge($dem, [
+            'reservation_date_debut'   => $res['date_debut'] ?? '',
+            'reservation_date_fin'     => $res['date_fin'] ?? '',
+            'reservation_nb_personnes' => (int)($res['nb_personnes'] ?? 0)
+        ]);
+    }
+
+    // Trier par date de début de réservation
+    usort($resultat, fn($a, $b) => strcmp($a['reservation_date_debut'], $b['reservation_date_debut']));
+
+    echo json_encode($resultat);
+    exit;
+}
+
 
 
 // Lecture des animateurs pour la planification des activités
@@ -497,10 +525,11 @@ $(document).ready(function(){
     <div class="card p-3 mb-3 bg-white">
         <div class="d-flex gap-2 align-items-end flex-wrap">
             <div>
-                <label for="activityDatePicker" class="form-label mb-1">Sélectionner une date</label>
+                <label for="activityDatePicker" class="form-label mb-1">Filtrer par date</label>
                 <input type="date" id="activityDatePicker" class="form-control">
             </div>
-            <button class="btn btn-primary" id="loadActivityRequestsBtn">Voir les demandes</button>
+            <button class="btn btn-primary" id="loadActivityRequestsBtn">Filtrer</button>
+            <button class="btn btn-secondary" id="loadAllActivityRequestsBtn">Voir toutes les dates</button>
         </div>
     </div>
     <div id="activityRequestsContainer"></div>
@@ -600,6 +629,17 @@ $(document).ready(function(){
         }).done(function(requests) {
             renderActivityRequests(requests, date);
         }).fail(function() { showMessage('Erreur de chargement des demandes.', 'danger'); });
+    });
+
+    $('#loadAllActivityRequestsBtn').on('click', function() {
+        $.ajax({
+            url: 'Admin.php',
+            method: 'GET',
+            data: { section: 'activites_all' },
+            dataType: 'json'
+        }).done(function(requests) {
+            renderActivityRequests(requests, 'all');
+        }).fail(function() { showMessage('Erreur de chargement.', 'danger'); });
     });
 
     // Planifier une activité
