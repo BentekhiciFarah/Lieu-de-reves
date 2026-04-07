@@ -132,6 +132,19 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
                                    value="1" required>
                         </div>
                     </div>
+                    
+                    <div class="Date de résa">
+                        <div class="col-md-4">
+                            <label class="form-label">Date souhaitée</label>
+                            <input type="date"
+                                name="date_souhaitee"
+                                class="form-control"
+                                min="<?= htmlspecialchars($res['date_debut']) ?>"
+                                max="<?= htmlspecialchars($res['date_fin']) ?>"
+                                value="<?= htmlspecialchars($res['date_debut']) ?>"
+                                required>
+                        </div>
+                    </div>
                     <div class="mt-2">
                         <label class="form-label">Précisions (optionnel)</label>
                         <textarea name="message" class="form-control" rows="2"

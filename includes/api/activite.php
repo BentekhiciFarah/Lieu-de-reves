@@ -84,18 +84,23 @@ switch ($action) {
         echo json_encode($resultat);
         break;
 
-    // ── POST action=demande ── Client : soumettre une demande d'activité
+    // Backend pour gérer une demande d'activité de la part d'un client
     case 'demande':
+        // Vérification de l'authentification et du rôle
         if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'client') {
+            // Accès refusé pour les non-clients
             echo json_encode(['success' => false, 'message' => 'Accès refusé']);
             exit;
         }
 
+        // Vérification de la méthode HTTP : on n'accepte que les POST pour créer une demande
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            // Méthode non autorisée
             echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
             exit;
         }
 
+        // Récupération et validation des données envoyées par le client
         $reservationId = $_POST['reservation_id'] ?? '';
         $activityId    = (int)($_POST['activity_id'] ?? 0);
         $creneau       = $_POST['creneau'] ?? '';
@@ -103,13 +108,16 @@ switch ($action) {
         $message       = trim($_POST['message'] ?? '');
         $email         = $_SESSION['email'] ?? '';
 
+        // Validation des données 
         if (!in_array($creneau, ['heure', 'demi-journee', 'journee'])) {
             echo json_encode(['success' => false, 'message' => 'Créneau invalide']);
             exit;
         }
 
+        // Vérifier que la réservation existe, appartient à l'utilisateur et est validée
         $reservations = readJson("reservation.json") ?: [];
         $reservation  = null;
+        // On cherche la bonne réservation
         foreach ($reservations as $res) {
             if ($res['id'] == $reservationId && ($res['email'] ?? '') === $email && ($res['statut'] ?? '') === 'validée') {
                 $reservation = $res;
@@ -117,17 +125,29 @@ switch ($action) {
             }
         }
 
+        // Si aucune réservation valide n'est trouvée, on retourne une erreur
         if (!$reservation) {
             echo json_encode(['success' => false, 'message' => 'Réservation introuvable ou non validée']);
             exit;
         }
 
+        // Utiliser la date souhaitée si fournie, sinon utiliser la date de début de la réservation
+        $date = $_POST['date_souhaitee'] ?? $reservation['date_debut'];
+
+        // Valider que la date est dans l'intervalle de la réservation
+        if ($date < $reservation['date_debut'] || $date > $reservation['date_fin']) {
+            echo json_encode(['success' => false, 'message' => 'Date hors de la période de réservation.']);
+            exit;
+        }
+
+        // Valider que le nombre de personnes demandé est cohérent avec la réservation
         $maxPersonnes = (int)($reservation['nb_personnes'] ?? 1);
         if ($nbPersonnes < 1 || $nbPersonnes > $maxPersonnes) {
             echo json_encode(['success' => false, 'message' => "Nombre de personnes invalide (max : {$maxPersonnes})"]);
             exit;
         }
 
+        // Vérifier que l'activité existe dans la base de données
         $activites = readJson("activities.json") ?: [];
         $activite  = null;
         foreach ($activites as $act) {
@@ -137,11 +157,13 @@ switch ($action) {
             }
         }
 
+        // Si l'activité n'est pas trouvée, on retourne une erreur
         if (!$activite) {
             echo json_encode(['success' => false, 'message' => 'Activité introuvable']);
             exit;
         }
 
+        // Créer une nouvelle demande d'activité et l'enregistrer dans le fichier JSON
         $demandes = readJson("activity_requests.json") ?: [];
 
         $nouvelleDemande = [
@@ -152,6 +174,7 @@ switch ($action) {
             'activity_id'    => $activityId,
             'activity_nom'   => $activite['nom'],
             'creneau'        => $creneau,
+            'date_souhaitee' => $date,
             'nb_personnes'   => $nbPersonnes,
             'message'        => $message,
             'statut'         => 'en_attente',
