@@ -70,8 +70,27 @@
         "heure": ""
     },
     {
+<<<<<<< HEAD
         "user_email": "youa@gmail.com",
         "reservation_id": "17756818645882",
+=======
+        "user_email": "farah@gmail.com",
+        "reservation_id": "17755878116892",
+        "prestation": {
+            "id": 1,
+            "name": "Navette a\u00e9roport",
+            "description": "Service de navette pour les transferts depuis et vers l'a\u00e9roport.",
+            "price": 40,
+            "type_tarification": "fixe"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
+    },
+    {
+        "user_email": "farah@gmail.com",
+        "reservation_id": "17755878116892",
+>>>>>>> bdb4bd8bc3edcd10ac4aa575ae32e0a27b63e4e5
         "prestation": {
             "id": 2,
             "name": "Petit d\u00e9jeuner en chambre",
@@ -82,5 +101,22 @@
         "statut": "valid\u00e9e",
         "adresse": "",
         "heure": ""
+<<<<<<< HEAD
+=======
+    },
+    {
+        "user_email": "farah@gmail.com",
+        "reservation_id": "17755878116892",
+        "prestation": {
+            "id": 4,
+            "name": "Massage relaxant",
+            "description": "S\u00e9ance de massage pour une d\u00e9tente totale dans notre spa.",
+            "price": 80,
+            "type_tarification": "par_personne"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
+>>>>>>> bdb4bd8bc3edcd10ac4aa575ae32e0a27b63e4e5
     }
 ]
