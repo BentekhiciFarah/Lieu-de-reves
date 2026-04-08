@@ -25,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
 
     // Nombre total de chambres pour les vérifications de validation
     $chambresDisponibles = [
-        'bungalow' => 5,
-        'villa' => 3,
-        'suite' => 2
+        'bungalow' => 10,
+        'villa' => 8,
+        'suite' => 10
     ];
 
     $messageAdmin = "Aucune action effectuée.";

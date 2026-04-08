@@ -70,6 +70,10 @@
         "heure": ""
     },
     {
+<<<<<<< HEAD
+        "user_email": "youa@gmail.com",
+        "reservation_id": "17756818645882",
+=======
         "user_email": "farah@gmail.com",
         "reservation_id": "17755878116892",
         "prestation": {
@@ -86,6 +90,7 @@
     {
         "user_email": "farah@gmail.com",
         "reservation_id": "17755878116892",
+>>>>>>> bdb4bd8bc3edcd10ac4aa575ae32e0a27b63e4e5
         "prestation": {
             "id": 2,
             "name": "Petit d\u00e9jeuner en chambre",
@@ -96,6 +101,8 @@
         "statut": "valid\u00e9e",
         "adresse": "",
         "heure": ""
+<<<<<<< HEAD
+=======
     },
     {
         "user_email": "farah@gmail.com",
@@ -110,5 +117,6 @@
         "statut": "valid\u00e9e",
         "adresse": "",
         "heure": ""
+>>>>>>> bdb4bd8bc3edcd10ac4aa575ae32e0a27b63e4e5
     }
 ]
