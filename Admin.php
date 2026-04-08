@@ -1,5 +1,11 @@
 <?php
+/*
+* Admin.php : page d'administration pour la gestion des réservations, accessible uniquement aux utilisateurs avec le rôle "admin".
+* Permet de valider ou refuser les demandes de réservation, d'enregistrer une avance et une réduction sur prestations pour les réservations validées.
+* Affiche également un tableau de bord avec le nombre de chambres réservées et disponibles, et une section pour les demandes d'activités en attente.
+*/
 session_start();
+// Inclure le fichier de gestion des données JSON pour lire et écrire les données de réservation, utilisateurs, prestations, etc.
 require_once "includes/json_data.php";
 
 
@@ -15,12 +21,23 @@ $messageAdmin = $_SESSION['message_admin'] ?? "";
 unset($_SESSION['message_admin']);
 
 
-// Handler POST : valider/refuser une réservation, ou mettre à jour avance/réduction (avec réponse JSON pour les requêtes AJAX, sinon redirection classique)
+/* 
+ * deux paramètres : reservation_id et action.
+ * Il gère quatre actions distinctes : valider, refuser, maj_avance, maj_reduction.
+ *
+ * A la fin, selon que la requête vient d'AJAX ou d'un formulaire classique,
+ * il répond différemment :
+ *   - AJAX    : retourne du JSON et termine avec exit()
+ *   - Classique : stocke le message en session et redirige
+ */
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_POST['action'])) {
+    // récupérer les paramètres de la requête POST
     $reservationId = $_POST['reservation_id'];
     $action = $_POST['action'];
 
-    $reservations = readJson("reservation.json"); // Lecture des réservations pour modification
+    // Lire les réservations et les utilisateurs depuis les fichiers JSON pour modification
+    $reservations = readJson("reservation.json"); 
     $users = readJson("users.json"); // Lecture des utilisateurs pour éventuellement créer un compte client lors de la validation d'une réservation
 
     // Nombre total de chambres pour les vérifications de validation
@@ -30,7 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
         'suite' => 10
     ];
 
+    // initialisation du msg admin pour le retour d'information à afficher après l'action
     $messageAdmin = "Aucune action effectuée.";
+    // flag pour vérifier si la réservation ciblée par l'action a été trouvée
     $reservationTrouvee = false;
 
     // Parcourir les réservations pour trouver celle à modifier et appliquer l'action demandée (valider/refuser/maj_arrhes/maj_reduction)
@@ -39,8 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
         if (($res['id'] ?? '') == $reservationId) {
             $reservationTrouvee = true;
 
-            $type = strtolower(trim($res['type_chambre'] ?? '')); // Récupérer le type de chambre de la réservation en cours
-
+            // // Récupérer le type de chambre de la réservation en cours
+            $type = strtolower(trim($res['type_chambre'] ?? ''));
+            
             // Action de validation : vérifier la disponibilité des chambres du même type avant de valider
             if ($action === 'valider') {
                 // Compter les chambres déjà validées du même type
