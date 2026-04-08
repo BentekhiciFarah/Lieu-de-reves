@@ -9,7 +9,9 @@
         "type_chambre": "bungalow",
         "message": "",
         "statut": "valid\u00e9e",
-        "date_creation": "2026-04-07 20:46:06"
+        "date_creation": "2026-04-07 20:46:06",
+        "arrhes": 100,
+        "reduction_prestations": 10
     },
     {
         "id": "17755878116892",
@@ -58,5 +60,67 @@
         "message": "",
         "statut": "valid\u00e9e",
         "date_creation": "2026-04-07 22:43:50"
+    },
+    {
+        "id": "17756804258559",
+        "nom": "amine",
+        "email": "aminechboukat088@gmail.com",
+        "date_debut": "2026-04-09",
+        "date_fin": "2026-04-11",
+        "nb_personnes": 5,
+        "type_chambre": "bungalow",
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-08 22:33:45"
+    },
+    {
+        "id": "17756804548982",
+        "nom": "amine",
+        "email": "aminechboukat088@gmail.com",
+        "date_debut": "2026-04-09",
+        "date_fin": "2026-04-11",
+        "nb_personnes": 5,
+        "type_chambre": "bungalow",
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-08 22:34:14"
+    },
+    {
+        "id": "17756818156601",
+        "nom": "az",
+        "email": "az@gmail.com",
+        "date_debut": "2026-04-09",
+        "date_fin": "2026-04-11",
+        "nb_personnes": 7,
+        "type_chambre": "villa",
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-08 22:56:55"
+    },
+    {
+        "id": "17756818645882",
+        "nom": "Youa",
+        "email": "youa@gmail.com",
+        "date_debut": "2026-04-09",
+        "date_fin": "2026-04-12",
+        "nb_personnes": 6,
+        "type_chambre": "villa",
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-08 22:57:44",
+        "arrhes": 100,
+        "reduction_prestations": 20
+    },
+    {
+        "id": "17756836662355",
+        "nom": "BBB",
+        "email": "BB@gmail.com",
+        "date_debut": "2026-04-10",
+        "date_fin": "2026-04-13",
+        "nb_personnes": 5,
+        "type_chambre": "villa",
+        "message": "",
+        "statut": "refus\u00e9e",
+        "date_creation": "2026-04-08 23:27:46"
     }
 ]

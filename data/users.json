@@ -38,5 +38,13 @@
         "email": "potit@gmail.com",
         "password": "$2y$10$C2iXn.WbPAOO5wjo7cYsteqTMrxrrU8lp8Brw4pFShMnZsWVYY00G",
         "role": "client"
+    },
+    {
+        "id": "17756818706098",
+        "nom": "Youa",
+        "prenom": "",
+        "email": "youa@gmail.com",
+        "password": "$2y$10$LOtOOTpKw5E8Xu6PzbpHXOvXf1VAnQVNAMhqmWQiijsDoZ2dr\/cye",
+        "role": "client"
     }
 ]

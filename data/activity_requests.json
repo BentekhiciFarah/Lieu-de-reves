@@ -108,5 +108,19 @@
         "message": "",
         "statut": "en_attente",
         "date_creation": "2026-04-07 22:45:07"
+    },
+    {
+        "id": "17756832399739",
+        "reservation_id": "17756818645882",
+        "user_email": "youa@gmail.com",
+        "user_nom": "Youa",
+        "activity_id": 2,
+        "activity_nom": "Sortie en bateau",
+        "creneau": "demi-journee",
+        "date_souhaitee": "2026-04-09",
+        "nb_personnes": 6,
+        "message": "",
+        "statut": "planifiee",
+        "date_creation": "2026-04-08 23:20:39"
     }
 ]
