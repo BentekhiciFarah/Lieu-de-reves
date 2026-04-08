@@ -605,7 +605,7 @@ $(document).ready(function(){
         });
     });
 
-    // Formatage automatique du numéro de carte (groupes de 4)
+    // Formatage automatique du numéro de carte bancaire pour ajouter des espaces tous les 4 chiffres et limiter à 16 chiffres
     $(document).on('input', 'input[name="numero_carte"]', function() {
         var val = $(this).val().replace(/\D/g, '').substring(0, 16);
         $(this).val(val.replace(/(.{4})/g, '$1 ').trim());
@@ -614,13 +614,17 @@ $(document).ready(function(){
     // Soumission du formulaire de paiement (simulation)
     $(document).on('submit', '.form-paiement', function(e) {
         e.preventDefault();
+        // Récupérer l'identifiant de la réservation à partir des données du formulaire
         var reservationId = $(this).data('reservation-id');
+        // Récupérer le bouton de soumission du formulaire pour le désactiver pendant le traitement
         var btn = $(this).find('button[type="submit"]');
+        // Désactiver le bouton pour éviter les clics multiples pendant le traitement du paiement
         btn.prop('disabled', true).text('Traitement en cours...');
 
         // Simulation d'un délai de traitement
         setTimeout(function() {
-            var modal = bootstrap.Modal.getInstance(document.getElementById('modalPaiement_' + reservationId));
+        var modal = bootstrap.Modal.getInstance(document.getElementById('modalPaiement_' + reservationId));
+            // Si le modal existe, le fermer pour revenir à la carte de réservation
             if (modal) modal.hide();
             // Cacher le bouton payer de cette réservation
             $('button[data-bs-target="#modalPaiement_' + reservationId + '"]').hide();
@@ -634,12 +638,15 @@ $(document).ready(function(){
 // Vérifie les statuts des réservations toutes les 5 secondes
 function refreshReservations() {
     $.ajax({
+        // chemin vers le script php qui envoie les statuts actuels des réservations du client
         url: 'refresh_reservations.php',
         method: 'GET',
         dataType: 'json'
     }).done(function(data) {
+        // Parcourir les données reçues et mettre à jour les badges de statut de chaque réservation
         $.each(data, function(i, res) {
             var badge = $('#statut_resa_' + res.id);
+            // Si le badge existe, mettre à jour son texte et sa classe en fonction du nouveau statut de la réservation
             if (badge.length) {
                 badge.text(res.statut.charAt(0).toUpperCase() + res.statut.slice(1));
                 badge.removeClass('bg-success bg-warning bg-danger text-dark');
@@ -650,7 +657,7 @@ function refreshReservations() {
         });
     });
 }
-
+// Appeler la fonction de rafraîchissement des réservations toutes les 5 secondes pour vérifier les changements de statut
 setInterval(refreshReservations, 5000);
 </script>
 </body>
