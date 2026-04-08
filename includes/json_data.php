@@ -37,11 +37,17 @@
             http_response_code(409); // Conflict
             return;
         }
+        // Convertir les données en JSON formaté
         $jsonContent = json_encode($data, JSON_PRETTY_PRINT);
+        // Vider le fichier avant d'écrire les nouvelles données
         ftruncate($f, 0);
+        // Revenir au début du fichier pour écrire
         fseek($f, 0);
+        // Écrire le contenu JSON dans le fichier
         fwrite($f, $jsonContent);
+        // Libérer le verrou et fermer le fichier
         flock($f, LOCK_UN);
+        // fermer le fichier après l'écriture
         fclose($f);
     }
 
@@ -96,7 +102,6 @@
                 $results[] = $element;
             }
         }
-
         return $results;
     }
 ?>

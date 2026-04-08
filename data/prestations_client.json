@@ -68,5 +68,19 @@
         "statut": "valid\u00e9e",
         "adresse": "",
         "heure": ""
+    },
+    {
+        "user_email": "farah@gmail.com",
+        "reservation_id": "17755878116892",
+        "prestation": {
+            "id": 1,
+            "name": "Navette a\u00e9roport",
+            "description": "Service de navette pour les transferts depuis et vers l'a\u00e9roport.",
+            "price": 40,
+            "type_tarification": "fixe"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
     }
 ]
