@@ -259,22 +259,33 @@ session_start();
 <script src="js/main.js"></script>
 
 <script>
+// Script pour gérer la soumission du formulaire de réservation via AJAX
 $(document).ready(function () {
+  // Lorsque le formulaire de réservation est soumis
     $('#reservationForm').on('submit', function (e) {
+      // Empêcher le comportement par défaut du formulaire pour gérer la soumission via AJAX
         e.preventDefault();
-
+        
+        // Désactiver le bouton de soumission et afficher un message d'attente
         var btn = $('#submitBtn');
         btn.prop('disabled', true).text('Envoi en cours…');
-
+      
+        // Cacher les messages précédents et réinitialiser les classes de style
         var msgDiv = $('#reservationMessage');
         msgDiv.addClass('d-none').removeClass('alert-success alert-danger').text('');
-
+        
+        // envoi en AJAX des données du formulaire à l'API de réservation
         $.ajax({
+          // URL de l'API de réservation à laquelle les données du formulaire seront envoyées
             url: 'includes/api/reservation.php',
+            // Méthode HTTP utilisée pour envoyer les données (POST dans ce cas)
             method: 'POST',
+            // Les données du formulaire sérialisées (transformées en une chaîne de caractères au format clé=valeur)
             data: $(this).serialize(),
+            // Type de données attendu
             dataType: 'json'
         }).done(function (res) {
+          // Si la réponse de l'API indique un succès, afficher un message de succès, sinon afficher un message d'erreur
             msgDiv
                 .removeClass('d-none')
                 .addClass(res.success ? 'alert alert-success' : 'alert alert-danger')
