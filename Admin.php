@@ -3,28 +3,27 @@ session_start();
 require_once "includes/json_data.php";
 
 
-
-// Vérification accès admin
+// Redirection vers la page de connexion si l'utilisateur n'est pas admin
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== "admin") {
     header("Location: Connexion.php");
     exit;
 }
 
-// Message admin après redirection
+// Récupération du message de session (s'il existe) pour l'afficher une seule fois dans la page admin,
+// puis suppression de ce message de la session
 $messageAdmin = $_SESSION['message_admin'] ?? "";
 unset($_SESSION['message_admin']);
 
 
-// Traitement du formulaire de validation/refus de réservation
-
+// Handler POST : valider/refuser une réservation, ou mettre à jour avance/réduction (avec réponse JSON pour les requêtes AJAX, sinon redirection classique)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_POST['action'])) {
     $reservationId = $_POST['reservation_id'];
     $action = $_POST['action'];
 
-    $reservations = readJson("reservation.json");
-    $users = readJson("users.json");
+    $reservations = readJson("reservation.json"); // Lecture des réservations pour modification
+    $users = readJson("users.json"); // Lecture des utilisateurs pour éventuellement créer un compte client lors de la validation d'une réservation
 
-    // Nombre total de chambres disponibles par type
+    // Nombre total de chambres pour les vérifications de validation
     $chambresDisponibles = [
         'bungalow' => 5,
         'villa' => 3,
@@ -34,35 +33,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
     $messageAdmin = "Aucune action effectuée.";
     $reservationTrouvee = false;
 
+    // Parcourir les réservations pour trouver celle à modifier et appliquer l'action demandée (valider/refuser/maj_arrhes/maj_reduction)
     foreach ($reservations as &$res) {
+        // Vérification de l'ID de réservation pour trouver la réservation ciblée par l'action
         if (($res['id'] ?? '') == $reservationId) {
             $reservationTrouvee = true;
 
-            $type = strtolower(trim($res['type_chambre'] ?? ''));
+            $type = strtolower(trim($res['type_chambre'] ?? '')); // Récupérer le type de chambre de la réservation en cours
 
-            // Normalisation des types
-            if ($type === 'bungalow sur pilotis' || $type === 'bungalow') {
-                $type = 'bungalow';
-            } elseif ($type === 'villa sur la plage' || $type === 'villa') {
-                $type = 'villa';
-            } elseif ($type === 'suite avec piscine privée' || $type === 'suite') {
-                $type = 'suite';
-            }
-
+            // Action de validation : vérifier la disponibilité des chambres du même type avant de valider
             if ($action === 'valider') {
                 // Compter les chambres déjà validées du même type
                 $countReserved = 0;
                 foreach ($reservations as $r) {
                     $typeR = strtolower(trim($r['type_chambre'] ?? ''));
 
-                    if ($typeR === 'bungalow sur pilotis' || $typeR === 'bungalow') {
-                        $typeR = 'bungalow';
-                    } elseif ($typeR === 'villa sur la plage' || $typeR === 'villa') {
-                        $typeR = 'villa';
-                    } elseif ($typeR === 'suite avec piscine privée' || $typeR === 'suite') {
-                        $typeR = 'suite';
-                    }
-
+                    // Incrémenter le compteur si une réservation du même type est déjà validée (et ce n'est pas la réservation en cours de validation)
                     if (
                         $typeR === $type &&
                         ($r['statut'] ?? '') === 'validée' &&
@@ -72,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
                     }
                 }
 
+                // Vérifier la disponibilité avant de valider la réservation
                 if (!isset($chambresDisponibles[$type])) {
                     $messageAdmin = "Type de chambre inconnu pour cette réservation.";
                 } elseif ($countReserved >= $chambresDisponibles[$type]) {
@@ -80,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
                     // Valider la réservation
                     $res['statut'] = 'validée';
 
-                    // Vérifier si le client existe déjà
+                    // Vérifier si le client existe déjà pour éviter de créer un compte en double
                     $userExiste = false;
                     foreach ($users as $user) {
                         if (($user['email'] ?? '') === ($res['email'] ?? '')) {
@@ -90,21 +77,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
                     }
 
                     if (!$userExiste) {
-                        // Générer un mot de passe temporaire
+                        // Générer un mot de passe temporaire pour le client (10 caractères aléatoires)
                         $motDePasse = bin2hex(random_bytes(5));
 
-                        // Créer le compte client
+                        // Créer le compte client avec les informations de la réservation et le mot de passe temporaire
                         $users[] = [
                             "id" => generateId($users),
                             "nom" => $res['nom'] ?? '',
                             "prenom" => "",
                             "email" => $res['email'] ?? '',
-                            "password" => password_hash($motDePasse, PASSWORD_DEFAULT),
+                            "password" => password_hash($motDePasse, PASSWORD_DEFAULT), // Hasher le mot de passe pour la sécurité
                             "role" => "client"
                         ];
 
-                        writeJson("users.json", $users);
+                        writeJson("users.json", $users); // Enregistrer le nouveau compte client dans le fichier JSON
 
+                        // Message d'information pour l'admin avec le mot de passe temporaire à transmettre au client
                         $messageAdmin = "Réservation validée pour {$res['nom']} ({$res['email']}). "
                                       . "Mot de passe temporaire : {$motDePasse}. "
                                       . "Merci d'envoyer ce mot de passe au client.";
@@ -118,8 +106,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
                 $res['statut'] = 'refusée';
                 $messageAdmin = "Réservation refusée pour {$res['nom']} ({$res['email']}).";
 
-            } elseif ($action === 'maj_arrhes') {
-                $montantArrhes = (float)($_POST['arrhes'] ?? 0);
+            } elseif ($action === 'maj_arrhes') { // Mise à jour du montant des arrhes (avance) pour une réservation validée
+                $montantArrhes = (float)($_POST['arrhes'] ?? 0); // Récupérer le montant des arrhes depuis le formulaire, avec une valeur par défaut de 0 si non fourni
 
                 if ($montantArrhes < 0) {
                     $montantArrhes = 0;
@@ -128,13 +116,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
                 $res['arrhes'] = $montantArrhes;
                 $messageAdmin = "Arrhes enregistrées pour {$res['nom']} ({$res['email']}) : {$montantArrhes} €.";
 
-            } elseif ($action === 'maj_reduction') {
-                $reduction = (int)($_POST['reduction_prestations'] ?? 0);
+            } elseif ($action === 'maj_reduction') { // Mise à jour du pourcentage de réduction sur prestations pour une réservation validée
+                $reduction = (int)($_POST['reduction_prestations'] ?? 0); // Récupérer le pourcentage de réduction depuis le formulaire
 
-                if (!in_array($reduction, [0, 10, 20, 50])) {
+                if (!in_array($reduction, [0, 10, 20, 50])) { // Vérifier que la réduction est bien dans les valeurs autorisées (0%, 10%, 20%, 50%)
                     $reduction = 0;
                 }
 
+                // Enregistrer la réduction dans la réservation
                 $res['reduction_prestations'] = $reduction;
                 $messageAdmin = "Réduction sur prestations enregistrée pour {$res['nom']} ({$res['email']}) : -{$reduction}%";
             }
@@ -142,25 +131,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
             break;
         }
     }
-    unset($res);
+    unset($res); // Briser la référence pour éviter les modifications involontaires après la boucle
 
+
+    // Si la réservation ciblée par l'action a été trouvée et modifiée, enregistrer les changements dans le fichier JSON
     if ($reservationTrouvee) {
         writeJson("reservation.json", $reservations);
     } else {
         $messageAdmin = "Réservation introuvable.";
     }
 
-    // Réponse JSON pour les requêtes AJAX (pas de rechargement de page)
+
+    // Si la requête est une requête AJAX (indiquée par l'en-tête X-Requested-With), 
+    //retourner une réponse JSON avec le résultat de l'action et les chambres réservées mises à jour 
+    //pour rafraîchir le tableau sans recharger la page 
+
     if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         header('Content-Type: application/json');
         // Recalculer les chambres réservées pour mettre à jour le tableau
         $resAfter = readJson("reservation.json") ?: [];
         $chRes = ['bungalow' => 0, 'villa' => 0, 'suite' => 0];
+        // Parcourir les réservations pour compter les chambres réservées de chaque type après la modification
         foreach ($resAfter as $r) {
             $t = strtolower(trim($r['type_chambre'] ?? ''));
-            if ($t === 'bungalow sur pilotis') $t = 'bungalow';
-            elseif ($t === 'villa sur la plage') $t = 'villa';
-            elseif ($t === 'suite avec piscine privée') $t = 'suite';
             if (($r['statut'] ?? '') === 'validée' && isset($chRes[$t])) $chRes[$t]++;
         }
         echo json_encode([
@@ -178,37 +171,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reservation_id'], $_P
 
 // Nombre total de chambres
 $chambresDisponibles = [
-    "bungalow" => 5,
-    "villa" => 3,
-    "suite" => 2
+    "bungalow" => 10,
+    "villa" => 8,
+    "suite" => 10
 ];
 
-// Lecture des réservations
+// Lecture des réservations pour affichage et calcul des chambres réservées
 $reservations = readJson("reservation.json") ?: [];
 
-// Handler AJAX GET : retourne les réservations validées en JSON
+// Handler AJAX GET : retourne les réservations validées pour affichage dans la section correspondante
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['section']) && $_GET['section'] === 'validees') {
-    header('Content-Type: application/json');
-    $validees = array_values(array_filter($reservations, function($r) {
+    header('Content-Type: application/json'); // Indiquer que la réponse est au format JSON
+    $validees = array_values(array_filter($reservations, function($r) { // Filtrer les réservations pour ne garder que celles qui sont validées
         return ($r['statut'] ?? '') === 'validée';
     }));
     echo json_encode($validees);
     exit;
 }
 
-// Handler AJAX GET : retourne les demandes d'activités en attente avec infos de réservation
+
+// Handler AJAX GET : retourne les demandes d'activités en attente pour toutes les dates, 
+//avec les informations de réservation associées, pour affichage dans la section correspondante
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['section']) && $_GET['section'] === 'activites_all') {
     header('Content-Type: application/json');
     $demandes     = readJson("activity_requests.json") ?: [];
     $reservations = readJson("reservation.json") ?: [];
 
-    $resMap = [];
+    $resMap = []; // Créer une map des réservations par ID pour un accès lors de l'association avec les demandes d'activités
     foreach ($reservations as $res) $resMap[$res['id']] = $res;
 
     $resultat = [];
+    // Parcourir les demandes d'activités pour trouver celles qui sont en attente et associer les informations de réservation correspondantes
     foreach ($demandes as $dem) {
         if (($dem['statut'] ?? '') !== 'en_attente') continue;
-        $res = $resMap[$dem['reservation_id']] ?? null;
+        $res = $resMap[$dem['reservation_id']] ?? null; 
         if (!$res) continue;
         $resultat[] = array_merge($dem, [
             'reservation_date_debut'   => $res['date_debut'] ?? '',
@@ -235,16 +231,10 @@ $chambresReservees = [
     "villa" => 0,
     "suite" => 0
 ];
+
+// Parcourir les réservations pour compter le nombre de chambres réservées de chaque type (statut validée)
 foreach ($reservations as $r) {
     $type = strtolower(trim($r['type_chambre'] ?? ''));
-
-    if ($type === 'bungalow sur pilotis' || $type === 'bungalow') {
-        $type = 'bungalow';
-    } elseif ($type === 'villa sur la plage' || $type === 'villa') {
-        $type = 'villa';
-    } elseif ($type === 'suite avec piscine privée' || $type === 'suite') {
-        $type = 'suite';
-    }
 
     if (($r['statut'] ?? '') === 'validée' && isset($chambresReservees[$type])) {
         $chambresReservees[$type]++;
@@ -262,9 +252,9 @@ foreach ($reservations as $r) {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 // Données des chambres disponibles pour les calculs côté client
-var chambresDisponibles = <?= json_encode($chambresDisponibles) ?>;
+var chambresDisponibles = <?= json_encode($chambresDisponibles) ?>; // Données des chambres réservées pour les calculs côté client
 
-// Échappe le HTML pour éviter les injections XSS
+// Fonction d'échappement pour éviter les injections HTML dans les messages et contenus dynamiques
 function escHtml(str) {
     return $('<div>').text(String(str || '')).html();
 }
@@ -279,13 +269,14 @@ function showMessage(message, type) {
 // Met à jour le tableau des chambres disponibles/réservées
 function updateChambresTable(chambresReservees) {
     $.each(chambresReservees, function(type, reservees) {
-        var row = $('#chambresTableBody tr[data-type="' + type + '"]');
-        row.find('.chambre-reservee').text(reservees);
-        row.find('.chambre-dispo').text(chambresDisponibles[type] - reservees);
+        var row = $('#chambresTableBody tr[data-type="' + type + '"]');// Mettre à jour le nombre de chambres réservées et disponibles dans le tableau
+        row.find('.chambre-reservee').text(reservees); // Mettre à jour le nombre de chambres réservées pour ce type
+        row.find('.chambre-dispo').text(chambresDisponibles[type] - reservees); // Mettre à jour le nombre de chambres disponibles en soustrayant les réservées du total disponible pour ce type
     });
 }
 
-// Construit le HTML d'une carte réservation validée
+
+// Construit le HTML d'une carte de réservation validée avec les informations et les formulaires de mise à jour des arrhes et réduction
 function renderValidatedCard(res) {
     var arrhes    = parseFloat(res.arrhes || 0).toFixed(2);
     var reduction = parseInt(res.reduction_prestations || 0);
@@ -337,7 +328,7 @@ function loadValidatedSection() {
         if (reservations.length === 0) {
             container.html('<div class="alert alert-secondary">Aucune réservation validée.</div>');
         } else {
-            $.each(reservations, function(i, res) {
+            $.each(reservations, function(i, res) { // Parcourir les réservations validées et construire une carte pour chacune
                 container.append(renderValidatedCard(res));
             });
         }
@@ -346,7 +337,7 @@ function loadValidatedSection() {
     });
 }
 
-var lastClickedAction = '';
+var lastClickedAction = ''; 
 
 $(document).ready(function(){
 
@@ -365,7 +356,8 @@ $(document).ready(function(){
         var card          = form.closest('.card');
         var action        = lastClickedAction;
         var reservationId = form.find('input[name="reservation_id"]').val();
-
+       
+        // Envoyer la requête AJAX pour valider ou refuser la réservation, avec l'ID de réservation et l'action à effectuer
         $.ajax({
             url: 'Admin.php',
             method: 'POST',
@@ -387,7 +379,9 @@ $(document).ready(function(){
         }).fail(function() { showMessage('Erreur de communication avec le serveur.', 'danger'); });
     });
 
-    // --- Formulaires arrhes ---
+
+
+    // --- Formulaires mise à jour arrhes 
     $(document).on('submit', '.arrhes-form', function(e) {
         e.preventDefault();
         var form          = $(this);
@@ -441,7 +435,8 @@ $(document).ready(function(){
 <div class="container">
     <h1 class="mb-4">Gestion des réservations</h1>
 
-    <!-- Zone de message admin (mise à jour via AJAX, sans rechargement) -->
+
+    <!-- Affichage du message de session (s'il existe) pour informer l'admin des actions effectuées, des erreurs -->
     <div id="messageAdmin">
     <?php if (!empty($messageAdmin)): ?>
         <div class="alert alert-info">
@@ -450,7 +445,8 @@ $(document).ready(function(){
     <?php endif; ?>
     </div>
 
-    <!-- État des chambres -->
+
+    <!-- Affichage de l'état des chambres (nombre réservées / disponibles) dans un tableau -->
     <h3>État des chambres</h3>
     <table class="table table-bordered bg-white">
         <thead class="table-dark">
@@ -473,7 +469,8 @@ $(document).ready(function(){
 
     <hr class="my-4">
 
-    <!-- Affichage des réservations classiques en attente -->
+
+    <!-- Affichage des demandes de réservation en attente avec les formulaires de validation/refus, et les informations de chaque demande -->
     <h3>Demandes de réservation en attente</h3>
     <div id="pendingContainer">
     <?php
@@ -507,12 +504,13 @@ $(document).ready(function(){
             Aucune demande en attente.
         </div>
     <?php endif; ?>
-    </div><!-- #pendingContainer -->
+    </div>
 
 
     <hr class="my-4">
 
-    <!-- Réservations validées : chargées via AJAX pour éviter tout rechargement -->
+
+    <!-- Affichage des réservations validées avec les formulaires de mise à jour des arrhes et réduction, et les informations de chaque réservation validée -->
     <h3>Réservations validées</h3>
     <div id="validatedContainer">
         <div class="text-center text-muted py-3"><em>Chargement...</em></div>
@@ -586,9 +584,9 @@ function renderActivityRequests(requests, date) {
                 '</label></div>';
         });
 
-        // Champs de planification
+
+        // Champs de planification (date, animateur, heure, créneau) et bouton de soumission pour planifier l'activité avec les demandes sélectionnées
         html += '<div class="row mt-3 g-2">' +
-            // Champ date uniquement en mode "toutes les dates"
             (date === 'all' ?
                 '<div class="col-md-3">' +
                     '<label class="form-label">Date <span class="text-danger">*</span></label>' +
