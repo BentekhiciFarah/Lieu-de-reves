@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
-    <title>Paradise Island - Hôtel de luxe sur une île privée</title>
+    <title>Paradise Island - île luxueuse</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
@@ -60,7 +60,7 @@
           <div class="col-md-12 ftco-animate text-center">
           	<div class="text mb-5 pb-3">
 	            <h1 class="mb-3">Bienvenue à Paradise Island</h1>
-				<h2>Hôtel de luxe sur une île privée tropicale</h2>
+				<h2>île privée tropicale luxueuse</h2>
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@
 	          </div>
 	          <div class="pb-md-5">
 				<p>
-				Paradise Island est un hôtel de prestige situé sur une île tropicale privée.
+				Paradise Island est une île tropicale privée.
 				Nos visiteurs profitent d’un cadre exceptionnel entre lagon turquoise,
 				villas élégantes, bungalows sur pilotis et activités exclusives.
 				</p>
