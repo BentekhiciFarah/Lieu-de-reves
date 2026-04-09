@@ -130,6 +130,7 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
         <div class="card mb-3 border-info">
             <div class="card-header bg-info text-white">Demander une activité</div>
             <div class="card-body">
+                <!-- début du formulaire -->
                 <form class="activity-request-form"
                       data-reservation-id="<?= htmlspecialchars($res['id']) ?>"
                       data-max-personnes="<?= (int)($res['nb_personnes'] ?? 1) ?>">
@@ -208,8 +209,8 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
                 </form>
             </div>
         </div>
-
-        <!-- Activités planifiées pour cette réservation (chargées via AJAX) -->
+        
+    <!-- repérer la section pour le rechargement ajax plus tard -->
         <div id="planned_activities_<?= htmlspecialchars($res['id']) ?>"></div>
 
     <?php endif; ?>
@@ -217,8 +218,9 @@ $plannedActivities = readJson("planned_activities.json") ?: [];
     <!-- Afficher la facture prévisionnelle et le bouton de paiement uniquement si la réservation est validée -->
     <?php if ($facture): ?>
         <hr>
-        <!-- Facture : mise à jour via AJAX après ajout de prestation ou activité -->
+        <!-- repérer la section pour le rechargement ajax plus tard -->
         <div id="facture_<?= htmlspecialchars($res['id']) ?>">
+            
         <h5>Facture prévisionnelle</h5>
         <table class="table table-bordered table-sm bg-white">
             <!-- en tête du tableau avec thead pour les colonnes de désignation et montant -->

@@ -147,6 +147,7 @@ session_start();
 
               <div class="col-md-6 mb-3">
                 <label for="date_debut">Date de début *</label>
+                <!-- calendrier natif du navigateur pour sélectionner la date de début de la réservation -->
                 <input type="date" class="form-control" id="date_debut" name="date_debut" required>
               </div>
 

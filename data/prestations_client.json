@@ -1,5 +1,6 @@
 [
     {
+<<<<<<< HEAD
         "user_email": "aminechboukat088@gmail.com",
         "reservation_id": "17757230608631",
         "prestation": {
@@ -7,6 +8,43 @@
             "name": "Petit d\u00e9jeuner en chambre",
             "description": "Service de petit d\u00e9jeuner livr\u00e9 directement dans la chambre.",
             "price": 20,
+=======
+        "user_email": "mm@gmail.com",
+        "reservation_id": "17757263697776",
+        "prestation": {
+            "id": 1,
+            "name": "Navette a\u00e9roport",
+            "description": "Service de navette pour les transferts depuis et vers l'a\u00e9roport.",
+            "price": 40,
+            "type_tarification": "fixe"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
+    },
+    {
+        "user_email": "mm@gmail.com",
+        "reservation_id": "17757263697776",
+        "prestation": {
+            "id": 4,
+            "name": "Massage relaxant",
+            "description": "S\u00e9ance de massage pour une d\u00e9tente totale dans notre spa.",
+            "price": 80,
+            "type_tarification": "par_personne"
+        },
+        "statut": "valid\u00e9e",
+        "adresse": "",
+        "heure": ""
+    },
+    {
+        "user_email": "mm@gmail.com",
+        "reservation_id": "17757263697776",
+        "prestation": {
+            "id": 5,
+            "name": "Excursion en bateau",
+            "description": "Une excursion en bateau pour d\u00e9couvrir les merveilles de la c\u00f4te.",
+            "price": 150,
+>>>>>>> a1f8cac247cc058e7d8849f47df6ab10a1fa29a6
             "type_tarification": "par_personne"
         },
         "statut": "valid\u00e9e",

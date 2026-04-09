@@ -359,6 +359,7 @@ function loadValidatedSection() {
 
 var lastClickedAction = ''; 
 
+// Quand le document est entièrement rechargé 
 $(document).ready(function(){
 
     // Charger la section validées au chargement de la page

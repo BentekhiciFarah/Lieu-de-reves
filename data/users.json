@@ -1,10 +1,66 @@
 [
     {
+<<<<<<< HEAD
         "id": "17757231125428",
         "nom": "amine",
         "prenom": "",
         "email": "aminechboukat088@gmail.com",
         "password": "$2y$10$Hh0wMst3x8M12GjwaqKOH.xwBkNdKhk6crqC\/PVRPwOP7zVaauTWC",
+=======
+        "id": "17755875765310",
+        "nom": "youpi",
+        "prenom": "",
+        "email": "youpi@youpi.com",
+        "password": "$2y$10$BZPLYUMMKj6eY2V4JWj4p.BMIcAxYwdnCGsfbD4WoJmYnnAEGRuc6",
+        "role": "client"
+    },
+    {
+        "id": "17755878176759",
+        "nom": "Farah",
+        "prenom": "",
+        "email": "farah@gmail.com",
+        "password": "$2y$10$wPA3vNX6preW0oHM42S6qeYFudSKIiG0klg15AeTNgZM9UOkewcM2",
+        "role": "client"
+    },
+    {
+        "id": "17755931256719",
+        "nom": "amine",
+        "prenom": "",
+        "email": "aminechboukat088@gmail.com",
+        "password": "$2y$10$9HXWsI\/i6TKeRCYtYISZV.\/wDlpogIpttF8KeiNMEknzjTGPCa\/eW",
+        "role": "client"
+    },
+    {
+        "id": "17755936866566",
+        "nom": "az",
+        "prenom": "",
+        "email": "az@gmail.com",
+        "password": "$2y$10$jV5ObPevx08J0ASDcC0i0e8.cMiC9Ww33TlMkQ.NWflMRT3IYalRG",
+        "role": "client"
+    },
+    {
+        "id": "17755946505208",
+        "nom": "potit",
+        "prenom": "",
+        "email": "potit@gmail.com",
+        "password": "$2y$10$C2iXn.WbPAOO5wjo7cYsteqTMrxrrU8lp8Brw4pFShMnZsWVYY00G",
+        "role": "client"
+    },
+    {
+        "id": "17756818706098",
+        "nom": "Youa",
+        "prenom": "",
+        "email": "youa@gmail.com",
+        "password": "$2y$10$LOtOOTpKw5E8Xu6PzbpHXOvXf1VAnQVNAMhqmWQiijsDoZ2dr\/cye",
+        "role": "client"
+    },
+    {
+        "id": "17757264338246",
+        "nom": "mm",
+        "prenom": "",
+        "email": "mm@gmail.com",
+        "password": "$2y$10$DMGxSQboMGjfdwoN3W15MuO3mCAOAwrSyPqazb3BDN4vhrjgK7tlm",
+>>>>>>> a1f8cac247cc058e7d8849f47df6ab10a1fa29a6
         "role": "client"
     }
 ]

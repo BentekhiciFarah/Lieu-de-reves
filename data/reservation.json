@@ -8,6 +8,7 @@
         "nb_personnes": 5,
         "type_chambre": "villa",
         "message": "",
+<<<<<<< HEAD
         "statut": "en_attente",
         "date_creation": "2026-04-08 23:57:30"
     },
@@ -22,5 +23,48 @@
         "message": "",
         "statut": "valid\u00e9e",
         "date_creation": "2026-04-09 10:24:20"
+=======
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-08 22:56:55"
+    },
+    {
+        "id": "17756818645882",
+        "nom": "Youa",
+        "email": "youa@gmail.com",
+        "date_debut": "2026-04-09",
+        "date_fin": "2026-04-12",
+        "nb_personnes": 6,
+        "type_chambre": "villa",
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-08 22:57:44",
+        "arrhes": 100,
+        "reduction_prestations": 20
+    },
+    {
+        "id": "17756836662355",
+        "nom": "BBB",
+        "email": "BB@gmail.com",
+        "date_debut": "2026-04-10",
+        "date_fin": "2026-04-13",
+        "nb_personnes": 5,
+        "type_chambre": "villa",
+        "message": "",
+        "statut": "refus\u00e9e",
+        "date_creation": "2026-04-08 23:27:46"
+    },
+    {
+        "id": "17757263697776",
+        "nom": "mm",
+        "email": "mm@gmail.com",
+        "date_debut": "2026-04-10",
+        "date_fin": "2026-04-24",
+        "nb_personnes": 5,
+        "type_chambre": "villa",
+        "message": "",
+        "statut": "valid\u00e9e",
+        "date_creation": "2026-04-09 11:19:29",
+        "arrhes": 100
+>>>>>>> a1f8cac247cc058e7d8849f47df6ab10a1fa29a6
     }
 ]
