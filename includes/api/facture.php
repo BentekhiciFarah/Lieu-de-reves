@@ -146,7 +146,7 @@ if (realpath($_SERVER['SCRIPT_FILENAME']) === __FILE__) {
 
     switch ($action) {
 
-        // ── GET action=detail ── Client : facture d'une réservation
+        // Partie appelée par le client pour obtenir les détails de la facture d'une réservation validée
         case 'detail':
             if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'client') {
                 http_response_code(403);
