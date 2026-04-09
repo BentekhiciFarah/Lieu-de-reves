@@ -46,13 +46,5 @@
         "email": "youa@gmail.com",
         "password": "$2y$10$LOtOOTpKw5E8Xu6PzbpHXOvXf1VAnQVNAMhqmWQiijsDoZ2dr\/cye",
         "role": "client"
-    },
-    {
-        "id": "17757218728430",
-        "nom": "Madame",
-        "prenom": "",
-        "email": "M@gmail.com",
-        "password": "$2y$10$IseIYbLLGl9tTTCQNH3RuOBYxICX27YUuWGEVLVRIce.FwL4M\/eu6",
-        "role": "client"
     }
 ]

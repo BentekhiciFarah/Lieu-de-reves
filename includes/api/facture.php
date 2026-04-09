@@ -99,7 +99,7 @@ function calculerFactureReservation($reservation, $roomTypes, $prestationsClient
     $reduction = (float)($reservation['reduction_prestations'] ?? 0);
 
     // Si une réduction est définie et qu'il y a des prestations, calculer le montant de la réduction et l'ajouter à la facture
-    if ($reduction > 0 && $totalPrestations > 0) {
+    if ($reduction > 0) {
         $montantReduction = -($totalPrestations * ($reduction / 100));
 
         // Ajouter une ligne pour la réduction sur les prestations à la facture

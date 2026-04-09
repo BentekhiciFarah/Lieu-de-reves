@@ -9,7 +9,7 @@
         "creneau": "demi-journee",
         "nb_personnes": 1,
         "message": "",
-        "statut": "planifiee",
+        "statut": "en_attente",
         "date_creation": "2026-04-07 20:46:56"
     },
     {
@@ -122,19 +122,5 @@
         "message": "",
         "statut": "planifiee",
         "date_creation": "2026-04-08 23:20:39"
-    },
-    {
-        "id": "17757219336116",
-        "reservation_id": "17757218599462",
-        "user_email": "M@gmail.com",
-        "user_nom": "Madame",
-        "activity_id": 1,
-        "activity_nom": "Plong\u00e9e sous-marine",
-        "creneau": "demi-journee",
-        "date_souhaitee": "2026-04-09",
-        "nb_personnes": 1,
-        "message": "",
-        "statut": "planifiee",
-        "date_creation": "2026-04-09 10:05:33"
     }
 ]

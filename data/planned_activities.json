@@ -44,36 +44,5 @@
             }
         ],
         "date_creation": "2026-04-08 23:21:35"
-    },
-    {
-        "id": "17757219681046",
-        "activity_id": 1,
-        "activity_nom": "Plong\u00e9e sous-marine",
-        "prix_par_pers": 90,
-        "date": "2026-04-25",
-        "heure": "23:04",
-        "creneau": "demi-journee",
-        "animateur": "Farah",
-        "request_ids": [
-            "17755876162977",
-            "17757219336116"
-        ],
-        "participants": [
-            {
-                "reservation_id": "17755875662172",
-                "user_email": "youpi@youpi.com",
-                "user_nom": "youpi",
-                "nb_personnes": 1,
-                "message_participant": ""
-            },
-            {
-                "reservation_id": "17757218599462",
-                "user_email": "M@gmail.com",
-                "user_nom": "Madame",
-                "nb_personnes": 1,
-                "message_participant": ""
-            }
-        ],
-        "date_creation": "2026-04-09 10:06:08"
     }
 ]
