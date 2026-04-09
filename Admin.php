@@ -562,19 +562,20 @@ function renderActivityRequests(requests, date) {
     var container = $('#activityRequestsContainer');
     container.empty();
 
+    // Afficher un message si aucune demande d'activité en attente pour la date sélectionnée
     if (requests.length === 0) {
         container.html('<div class="alert alert-secondary">Aucune demande d\'activité en attente pour cette date.</div>');
         return;
     }
 
-    // Regrouper les demandes par activité
+    // Grouper les demandes par activité pour les afficher ensemble dans une même carte
     var groups = {};
     $.each(requests, function(i, req) {
-        var key = req.activity_id;
+        var key = req.activity_id;// Utiliser l'ID de l'activité comme clé de regroupement
         if (!groups[key]) {
             groups[key] = { activity_id: req.activity_id, activity_nom: req.activity_nom, requests: [] };
         }
-        groups[key].requests.push(req);
+        groups[key].requests.push(req); // Ajouter la demande à son groupe d'activité correspondant
     });
 
     // Construire le select des animateurs (réutilisé dans chaque groupe)
@@ -583,7 +584,7 @@ function renderActivityRequests(requests, date) {
         animateursOptions += '<option value="' + escHtml(a.nom) + '">' + escHtml(a.nom) + '</option>';
     });
 
-    $.each(groups, function(activityId, group) {
+    $.each(groups, function(activityId, group) {// Parcourir les groupes d'activités pour construire une carte pour chaque activité avec ses demandes associées
         var html = '<div class="card mb-4"><div class="card-header"><strong>' +
             escHtml(group.activity_nom) + '</strong></div><div class="card-body">' +
             '<form class="plan-activity-form" data-activity-id="' + activityId + '" data-date="' + escHtml(date) + '">' +
@@ -591,7 +592,7 @@ function renderActivityRequests(requests, date) {
             // Checkboxes des demandes
             '<p class="mb-2"><strong>Demandes à inclure :</strong></p>';
 
-        $.each(group.requests, function(i, req) {
+        $.each(group.requests, function(i, req) { // Parcourir les demandes d'une même activité pour construire une checkbox pour chacune avec les informations de la demande
             var creneauLabel = { heure: 'À l\'heure', 'demi-journee': 'Demi-journée', journee: 'Journée' }[req.creneau] || req.creneau;
             html += '<div class="form-check mb-1">' +
                 '<input class="form-check-input" type="checkbox" name="request_ids[]" value="' + req.id + '" id="req_' + req.id + '">' +
@@ -636,7 +637,8 @@ function renderActivityRequests(requests, date) {
     });
 }
 
-$(document).ready(function(){
+// Gestion des interactions pour les demandes d'activités : chargement, planification, etc.
+$(document).ready(function(){ 
 
     // Charger les demandes d'activités pour la date sélectionnée
     $('#loadActivityRequestsBtn').on('click', function() {
@@ -655,6 +657,7 @@ $(document).ready(function(){
         }).fail(function() { showMessage('Erreur de chargement des demandes.', 'danger'); });
     });
 
+    // Charger toutes les demandes d'activités en attente pour toutes les dates
     $('#loadAllActivityRequestsBtn').on('click', function() {
         $.ajax({
             url: 'Admin.php',

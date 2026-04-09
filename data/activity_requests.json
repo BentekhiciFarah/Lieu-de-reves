@@ -1,1 +1,16 @@
-[]
+[
+    {
+        "id": "17757231684944",
+        "reservation_id": "17757230608631",
+        "user_email": "aminechboukat088@gmail.com",
+        "user_nom": "amine",
+        "activity_id": 2,
+        "activity_nom": "Sortie en bateau",
+        "creneau": "demi-journee",
+        "date_souhaitee": "2026-04-10",
+        "nb_personnes": 4,
+        "message": "",
+        "statut": "en_attente",
+        "date_creation": "2026-04-09 10:26:08"
+    }
+]
